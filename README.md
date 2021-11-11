@@ -1,6 +1,6 @@
-# Oxygen Meter
+# Lock Variations
 
-SKSE plugin that repurposes the enchantment charge meter for an oxygen meter when underwater
+SKSE plugin that enables unique lock models
 
 ## Requirements
 * [CMake](https://cmake.org/)
@@ -21,8 +21,8 @@ SKSE plugin that repurposes the enchantment charge meter for an oxygen meter whe
 
 ## Building
 ```
-git clone https://github.com/powerof3/OxygenMeter.git
-cd OxygenMeter
+git clone https://github.com/powerof3/LockVariations.git
+cd LockVariations
 cmake -B build -S .
 ```
 ## License
