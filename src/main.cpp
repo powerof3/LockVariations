@@ -15,8 +15,8 @@ namespace Model
 
 	inline void Install()
 	{
-		REL::Relocation<std::uintptr_t> target{ REL::ID(51081), 0xC6 };
-		stl::write_thunk_call<RequestModel>(target.address());
+		REL::Relocation<std::uintptr_t> target{ REL::Offset(0x8C7450) };
+		stl::write_thunk_call<RequestModel>(target.address() + 0xBC);
 	}
 }
 
@@ -92,21 +92,32 @@ namespace Sound
 
 	inline void Install()
 	{
-		REL::Relocation<std::uintptr_t> update_lock_angle{ REL::ID(51096) };
-		stl::write_thunk_call<CylinderSqueak>(update_lock_angle.address() + 0x159);
-		stl::write_thunk_call<CylinderStop>(update_lock_angle.address() + 0xD9);
-		stl::write_thunk_call<LockpickingUnlock>(update_lock_angle.address() + 0xA1);
+		REL::Relocation<std::uintptr_t> update_lock_angle{ REL::Offset(0x8C9620) };
+		stl::write_thunk_call<CylinderSqueak>(update_lock_angle.address() + 0x157);
+		stl::write_thunk_call<CylinderStop>(update_lock_angle.address() + 0xD7);
+		stl::write_thunk_call<LockpickingUnlock>(update_lock_angle.address() + 0x9F);
 
-		REL::Relocation<std::uintptr_t> rotate_lock{ REL::ID(51098) };
-		stl::write_thunk_call<CylinderTurn>(rotate_lock.address() + 0x33);
+		REL::Relocation<std::uintptr_t> rotate_lock{ REL::Offset(0x8C9940) };
+		stl::write_thunk_call<CylinderTurn>(rotate_lock.address() + 0xBC);
 
-		REL::Relocation<std::uintptr_t> update_pick_angle{ REL::ID(51094) };
-		stl::write_thunk_call<PickMovement>(update_pick_angle.address() + 0x13F);
+		REL::Relocation<std::uintptr_t> update_pick_angle{ REL::Offset(0x8C9120) };
+		stl::write_thunk_call<PickMovement>(update_pick_angle.address() + 0x145);
 	}
 }
 
-extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface* a_skse, SKSE::PluginInfo* a_info)
+extern "C" __declspec(dllexport) constexpr auto SKSEPlugin_Version = []() {
+	SKSE::PluginVersionData v{};
+	v.pluginVersion = 2;
+	v.PluginName("Lock Variations"sv);
+	v.AuthorName("powerofthree"sv);
+	v.CompatibleVersions({ SKSE::RUNTIME_1_6_318 });
+	return v;
+}();
+
+extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
 {
+	logger::info("loaded plugin");
+
 	auto path = logger::log_directory();
 	if (!path) {
 		return false;
@@ -124,29 +135,7 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface* a
 	spdlog::set_pattern("[%H:%M:%S:%e] %v"s);
 
 	logger::info(FMT_STRING("{} v{}"), Version::PROJECT, Version::NAME);
-
-	a_info->infoVersion = SKSE::PluginInfo::kVersion;
-	a_info->name = "Lock Replacer";
-	a_info->version = Version::MAJOR;
-
-	if (a_skse->IsEditor()) {
-		logger::critical("Loaded in editor, marking as incompatible"sv);
-		return false;
-	}
-
-	const auto ver = a_skse->RuntimeVersion();
-	if (ver < SKSE::RUNTIME_1_5_39) {
-		logger::critical(FMT_STRING("Unsupported runtime version {}"), ver.string());
-		return false;
-	}
-
-	return true;
-}
-
-extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
-{
-	logger::info("loaded plugin");
-
+	
 	SKSE::Init(a_skse);
 	SKSE::AllocTrampoline(84);
 
