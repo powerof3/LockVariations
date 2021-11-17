@@ -107,17 +107,15 @@ namespace Sound
 
 extern "C" __declspec(dllexport) constexpr auto SKSEPlugin_Version = []() {
 	SKSE::PluginVersionData v{};
-	v.pluginVersion = 2;
+	v.pluginVersion = Version::MAJOR;
 	v.PluginName("Lock Variations"sv);
 	v.AuthorName("powerofthree"sv);
 	v.CompatibleVersions({ SKSE::RUNTIME_1_6_318 });
 	return v;
 }();
 
-extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
+bool InitLogger()
 {
-	logger::info("loaded plugin");
-
 	auto path = logger::log_directory();
 	if (!path) {
 		return false;
@@ -132,10 +130,21 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 	log->flush_on(spdlog::level::info);
 
 	spdlog::set_default_logger(std::move(log));
-	spdlog::set_pattern("[%H:%M:%S:%e] %v"s);
+	spdlog::set_pattern("[%l] %v"s);
 
 	logger::info(FMT_STRING("{} v{}"), Version::PROJECT, Version::NAME);
-	
+
+	return true;
+}
+
+extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
+{
+	if (InitLogger()) {
+		return false;
+	}
+
+	logger::info("loaded plugin");
+
 	SKSE::Init(a_skse);
 	SKSE::AllocTrampoline(84);
 
