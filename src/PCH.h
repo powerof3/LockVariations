@@ -6,7 +6,6 @@
 #include "RE/Skyrim.h"
 #include "SKSE/SKSE.h"
 
-#include <ranges>
 #include <SimpleIni.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <xbyak/xbyak.h>
@@ -19,13 +18,8 @@ using namespace std::literals;
 
 namespace stl
 {
-	template <class F, class T>
-	void write_vfunc()
-	{
-		REL::Relocation<std::uintptr_t> vtbl{ F::VTABLE[0] };
-		T::func = vtbl.write_vfunc(T::size, T::thunk);
-	}
-
+	using namespace SKSE::stl;
+	
 	template <class T>
 	void write_thunk_call(std::uintptr_t a_src)
 	{

@@ -15,7 +15,7 @@ namespace Model
 
 	inline void Install()
 	{
-		REL::Relocation<std::uintptr_t> target{ REL::Offset(0x8C7450) };
+		REL::Relocation<std::uintptr_t> target{ REL::ID(51960) };
 		stl::write_thunk_call<RequestModel>(target.address() + 0xBC);
 	}
 }
@@ -92,33 +92,35 @@ namespace Sound
 
 	inline void Install()
 	{
-		REL::Relocation<std::uintptr_t> update_lock_angle{ REL::Offset(0x8C9620) };
+		REL::Relocation<std::uintptr_t> update_lock_angle{ REL::ID(51978) };
 		stl::write_thunk_call<CylinderSqueak>(update_lock_angle.address() + 0x157);
 		stl::write_thunk_call<CylinderStop>(update_lock_angle.address() + 0xD7);
 		stl::write_thunk_call<LockpickingUnlock>(update_lock_angle.address() + 0x9F);
 
-		REL::Relocation<std::uintptr_t> rotate_lock{ REL::Offset(0x8C9940) };
+		REL::Relocation<std::uintptr_t> rotate_lock{ REL::ID(51980) };
 		stl::write_thunk_call<CylinderTurn>(rotate_lock.address() + 0xBC);
 
-		REL::Relocation<std::uintptr_t> update_pick_angle{ REL::Offset(0x8C9120) };
+		REL::Relocation<std::uintptr_t> update_pick_angle{ REL::ID(51976) };
 		stl::write_thunk_call<PickMovement>(update_pick_angle.address() + 0x145);
 	}
 }
 
-extern "C" __declspec(dllexport) constexpr auto SKSEPlugin_Version = []() {
-	SKSE::PluginVersionData v{};
-	v.pluginVersion = Version::MAJOR;
-	v.PluginName("Lock Variations"sv);
-	v.AuthorName("powerofthree"sv);
-	v.CompatibleVersions({ SKSE::RUNTIME_1_6_318 });
+extern "C" DLLEXPORT constinit auto SKSEPlugin_Version = []() {
+	SKSE::PluginVersionData v;
+	v.PluginVersion(Version::MAJOR);
+	v.PluginName("Lock Variations");
+	v.AuthorName("powerofthree");
+	v.UsesAddressLibrary(true);
+	v.CompatibleVersions({ SKSE::RUNTIME_LATEST });
+
 	return v;
 }();
 
-bool InitLogger()
+void InitializeLog()
 {
 	auto path = logger::log_directory();
 	if (!path) {
-		return false;
+		stl::report_and_fail("Failed to find standard logging directory"sv);
 	}
 
 	*path /= fmt::format(FMT_STRING("{}.log"), Version::PROJECT);
@@ -133,15 +135,11 @@ bool InitLogger()
 	spdlog::set_pattern("[%l] %v"s);
 
 	logger::info(FMT_STRING("{} v{}"), Version::PROJECT, Version::NAME);
-
-	return true;
 }
 
 extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
 {
-	if (InitLogger()) {
-		return false;
-	}
+	InitializeLog();
 
 	logger::info("loaded plugin");
 

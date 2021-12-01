@@ -88,9 +88,6 @@ else ()
 	)
 endif ()
 
-find_package(spdlog REQUIRED CONFIG)
-find_package(xbyak REQUIRED CONFIG)
-
 find_path(SIMPLEINI_INCLUDE_DIRS "ConvertUTF.c")
 
 # ---- Add source files ----
@@ -149,8 +146,6 @@ target_link_libraries(
 	${PROJECT_NAME}
 	PRIVATE
 		CommonLibSSE::CommonLibSSE
-		spdlog::spdlog
-		xbyak::xbyak
 )
 
 target_precompile_headers(
