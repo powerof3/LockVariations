@@ -105,16 +105,13 @@ public:
 					lockData = it->second;
 				}
 				if (!lockData) {
-					if (detail::has_snow(model)) {
-						if (it = lockDataMap.find("IceCastle"); it != lockDataMap.end()) {
+					if (detail::is_underwater(ref)) {
+						if (it = lockDataMap.find("Underwater"); it != lockDataMap.end()) {
 							lockType = it->first;
 							lockData = it->second;
 						}
-					}
-				}
-				if (!lockData) {
-					if (detail::is_underwater(ref)) {
-						if (it = lockDataMap.find("Underwater"); it != lockDataMap.end()) {
+					} else if (detail::has_snow(model)) {
+						if (it = lockDataMap.find("IceCastle"); it != lockDataMap.end()) {
 							lockType = it->first;
 							lockData = it->second;
 						}
