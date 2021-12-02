@@ -112,10 +112,17 @@ public:
 						}
 					}
 				}
+				if (!lockData) {
+					if (detail::is_underwater(ref)) {
+						if (it = lockDataMap.find("Underwater"); it != lockDataMap.end()) {
+							lockType = it->first;
+							lockData = it->second;
+						}
+					}
+				}
 				if (lockType && lockData) {
-					const auto waterLevel = ref->GetSubmergedWaterLevel(ref->GetPositionZ(), ref->GetParentCell());
 					const auto isDoor = base->Is(RE::FormType::Door);
-					if (waterLevel >= 0.875f) {
+					if (detail::is_underwater(ref)) {
 						return isDoor ? lockData->doorWaterModel : lockData->chestWaterModel;
 					}
 					return isDoor ? lockData->doorModel : lockData->chestModel;
@@ -155,6 +162,12 @@ private:
 				}
 			}
 			return false;
+		}
+
+		static bool is_underwater(RE::TESObjectREFR* a_ref)
+		{
+			const auto waterLevel = a_ref->GetSubmergedWaterLevel(a_ref->GetPositionZ(), a_ref->GetParentCell());
+			return waterLevel >= 0.875f;
 		}
 	};
 
