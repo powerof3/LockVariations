@@ -9,6 +9,8 @@ public:
 		std::string doorModel{ "Interface/Lockpicking/LockPickShiv01.nif" };
 		std::string chestWaterModel{ "Interface/Lockpicking/LockPickShiv01.nif" };
 		std::string doorWaterModel{ "Interface/Lockpicking/LockPickShiv01.nif" };
+		std::string chestSnowModel{ "Interface/Lockpicking/LockPickShiv01.nif" };
+		std::string doorSnowModel{ "Interface/Lockpicking/LockPickShiv01.nif" };
 	};
 
 	struct SoundData
@@ -69,6 +71,8 @@ public:
 				detail::get_value(ini, lock.doorModel, section, "Door");
 				detail::get_value(ini, lock.chestWaterModel, section, "Chest [Water]", lock.chestModel);
 				detail::get_value(ini, lock.doorWaterModel, section, "Door [Water]", lock.doorModel);
+				detail::get_value(ini, lock.chestSnowModel, section, "Chest [Snow]", lock.chestModel);
+				detail::get_value(ini, lock.doorSnowModel, section, "Door [Snow]", lock.doorModel);
 
 				detail::get_value(ini, sound.UILockpickingCylinderSqueakA, section, "CylinderSqueakA");
 				detail::get_value(ini, sound.UILockpickingCylinderSqueakB, section, "CylinderSqueakB");
@@ -121,6 +125,8 @@ public:
 					const auto isDoor = base->Is(RE::FormType::Door);
 					if (detail::is_underwater(ref)) {
 						return isDoor ? lockData->doorWaterModel : lockData->chestWaterModel;
+					} else if (detail::has_snow(model)) {
+						return isDoor ? lockData->doorSnowModel : lockData->chestSnowModel;
 					}
 					return isDoor ? lockData->doorModel : lockData->chestModel;
 				}
