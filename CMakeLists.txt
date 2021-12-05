@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 set(NAME "po3_LockVariations")
-set(VERSION 1.0.0)
+set(VERSION 1.1.0)
 
 # ---- Options ----
 
@@ -231,7 +231,7 @@ if (MSVC)
 			"$<$<CONFIG:DEBUG>:/INCREMENTAL;/OPT:NOREF;/OPT:NOICF>"
 			"$<$<CONFIG:RELEASE>:/INCREMENTAL:NO;/OPT:REF;/OPT:ICF;/DEBUG:FULL>"
 	)
-	
+
 endif ()
 
 # ---- Post build ----

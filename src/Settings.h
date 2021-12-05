@@ -7,6 +7,10 @@ public:
 	{
 		std::string chestModel{ "Interface/Lockpicking/LockPickShiv01.nif" };
 		std::string doorModel{ "Interface/Lockpicking/LockPickShiv01.nif" };
+		std::string chestWaterModel{ "Interface/Lockpicking/LockPickShiv01.nif" };
+		std::string doorWaterModel{ "Interface/Lockpicking/LockPickShiv01.nif" };
+		std::string chestSnowModel{ "Interface/Lockpicking/LockPickShiv01.nif" };
+		std::string doorSnowModel{ "Interface/Lockpicking/LockPickShiv01.nif" };
 	};
 
 	struct SoundData
@@ -65,6 +69,10 @@ public:
 
 				detail::get_value(ini, lock.chestModel, section, "Chest");
 				detail::get_value(ini, lock.doorModel, section, "Door");
+				detail::get_value(ini, lock.chestWaterModel, section, "Chest [Water]", lock.chestModel);
+				detail::get_value(ini, lock.doorWaterModel, section, "Door [Water]", lock.doorModel);
+				detail::get_value(ini, lock.chestSnowModel, section, "Chest [Snow]", lock.chestModel);
+				detail::get_value(ini, lock.doorSnowModel, section, "Door [Snow]", lock.doorModel);
 
 				detail::get_value(ini, sound.UILockpickingCylinderSqueakA, section, "CylinderSqueakA");
 				detail::get_value(ini, sound.UILockpickingCylinderSqueakB, section, "CylinderSqueakB");
@@ -101,27 +109,30 @@ public:
 					lockData = it->second;
 				}
 				if (!lockData) {
-					auto modelSwap = model->GetAsModelTextureSwap();
-					if (modelSwap && modelSwap->alternateTextures) {
-						std::span span(modelSwap->alternateTextures, modelSwap->numAlternateTextures);
-						for (const auto& texture : span) {
-							const auto txst = texture.textureSet;
-							if (txst && string::icontains(txst->textures[RE::BSTextureSet::Texture::kDiffuse].textureName, "snow"sv)) {
-								if (it = lockDataMap.find("IceCastle"); it != lockDataMap.end()) {
-									lockType = it->first;
-									lockData = it->second;
-								}
-								break;
-							}
+					if (detail::is_underwater(ref)) {
+						if (it = lockDataMap.find("Underwater"); it != lockDataMap.end()) {
+							lockType = it->first;
+							lockData = it->second;
+						}
+					} else if (detail::has_snow(model)) {
+						if (it = lockDataMap.find("IceCastle"); it != lockDataMap.end()) {
+							lockType = it->first;
+							lockData = it->second;
 						}
 					}
 				}
-				if (lockData) {
-					return base->Is(RE::FormType::Door) ? lockData->doorModel : lockData->chestModel;
+				if (lockType && lockData) {
+					const auto isDoor = base->Is(RE::FormType::Door);
+					if (detail::is_underwater(ref)) {
+						return isDoor ? lockData->doorWaterModel : lockData->chestWaterModel;
+					} else if (detail::has_snow(model)) {
+						return isDoor ? lockData->doorSnowModel : lockData->chestSnowModel;
+					}
+					return isDoor ? lockData->doorModel : lockData->chestModel;
 				}
 			}
 		}
-	
+
 		return a_fallbackPath;
 	}
 
@@ -136,10 +147,31 @@ public:
 private:
 	struct detail
 	{
-		static void get_value(CSimpleIniA& a_ini, std::string& a_value, const char* a_section, const char* a_key)
+		static void get_value(CSimpleIniA& a_ini, std::string& a_value, const char* a_section, const char* a_key, const std::string& a_default = std::string())
 		{
-			a_value = a_ini.GetValue(a_section, a_key, a_value.c_str());
+			a_value = a_ini.GetValue(a_section, a_key, a_default.empty() ? a_value.c_str() : a_default.c_str());
 		};
+
+		static bool has_snow(RE::TESModel* a_model)
+		{
+			auto modelSwap = a_model->GetAsModelTextureSwap();
+			if (modelSwap && modelSwap->alternateTextures) {
+				std::span span(modelSwap->alternateTextures, modelSwap->numAlternateTextures);
+				for (const auto& texture : span) {
+					const auto txst = texture.textureSet;
+					if (txst && string::icontains(txst->textures[RE::BSTextureSet::Texture::kDiffuse].textureName, "snow"sv)) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+
+		static bool is_underwater(RE::TESObjectREFR* a_ref)
+		{
+			const auto waterLevel = a_ref->GetSubmergedWaterLevel(a_ref->GetPositionZ(), a_ref->GetParentCell());
+			return waterLevel >= 0.875f;
+		}
 	};
 
 	std::map<std::string, LockData> lockDataMap;
