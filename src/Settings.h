@@ -3,14 +3,23 @@
 class Settings
 {
 public:
+	static inline std::string_view defaultLock{ "Interface/Lockpicking/LockPickShiv01.nif"sv };
+	static inline std::string_view defaultLockPick{ "Interface/Lockpicking/LockPick01.nif"sv };
+	static inline std::string_view skeletonKey{ "Interface/Lockpicking/LockPickSkeletonKey01.nif"sv };
+
+	struct Lock
+	{
+		std::string model{ defaultLock };
+		std::string waterModel{ defaultLock };
+		std::string snowModel{ defaultLock };
+	};
+
 	struct LockData
 	{
-		std::string chestModel{ "Interface/Lockpicking/LockPickShiv01.nif" };
-		std::string doorModel{ "Interface/Lockpicking/LockPickShiv01.nif" };
-		std::string chestWaterModel{ "Interface/Lockpicking/LockPickShiv01.nif" };
-		std::string doorWaterModel{ "Interface/Lockpicking/LockPickShiv01.nif" };
-		std::string chestSnowModel{ "Interface/Lockpicking/LockPickShiv01.nif" };
-		std::string doorSnowModel{ "Interface/Lockpicking/LockPickShiv01.nif" };
+		std::string lockpickModel{ defaultLockPick };
+
+		Lock chest;
+		Lock door;
 	};
 
 	struct SoundData
@@ -67,12 +76,15 @@ public:
 				LockData lock{};
 				SoundData sound{};
 
-				detail::get_value(ini, lock.chestModel, section, "Chest");
-				detail::get_value(ini, lock.doorModel, section, "Door");
-				detail::get_value(ini, lock.chestWaterModel, section, "Chest [Water]", lock.chestModel);
-				detail::get_value(ini, lock.doorWaterModel, section, "Door [Water]", lock.doorModel);
-				detail::get_value(ini, lock.chestSnowModel, section, "Chest [Snow]", lock.chestModel);
-				detail::get_value(ini, lock.doorSnowModel, section, "Door [Snow]", lock.doorModel);
+				detail::get_value(ini, lock.door.model, section, "Door");
+				detail::get_value(ini, lock.door.waterModel, section, "Door [Water]", lock.door.model);
+				detail::get_value(ini, lock.door.snowModel, section, "Door [Snow]", lock.door.model);
+
+				detail::get_value(ini, lock.chest.model, section, "Chest");
+				detail::get_value(ini, lock.chest.waterModel, section, "Chest [Water]", lock.chest.model);
+				detail::get_value(ini, lock.chest.snowModel, section, "Chest [Snow]", lock.chest.model);
+
+				detail::get_value(ini, lock.lockpickModel, section, "Lockpick");
 
 				detail::get_value(ini, sound.UILockpickingCylinderSqueakA, section, "CylinderSqueakA");
 				detail::get_value(ini, sound.UILockpickingCylinderSqueakB, section, "CylinderSqueakB");
@@ -81,8 +93,14 @@ public:
 				detail::get_value(ini, sound.UILockpickingPickMovement, section, "PickMovement");
 				detail::get_value(ini, sound.UILockpickingUnlock, section, "LockpickingUnlock");
 
-				lockDataMap[section] = lock;
-				soundDataMap[section] = sound;
+				if (const auto it = lockDataMap.find(section); it == lockDataMap.end()) {
+					lockDataMap.emplace(section, lock);
+				} else {
+					auto& existingLock = it->second;
+					detail::fill_default_lock(existingLock, lock);
+				}
+
+				soundDataMap.emplace(section, sound);
 			}
 		}
 
@@ -95,45 +113,76 @@ public:
 		lockType = std::nullopt;
 		std::optional<LockData> lockData = std::nullopt;
 
-		auto ref = RE::LockpickingMenu::GetTargetReference();
-		if (ref) {
-			auto base = ref ? ref->GetBaseObject() : nullptr;
-			auto model = base ? base->As<RE::TESModel>() : nullptr;
+		const auto ref = RE::LockpickingMenu::GetTargetReference();
+		const auto base = ref ? ref->GetBaseObject() : nullptr;
+		const auto model = base ? base->As<RE::TESModel>() : nullptr;
 
-			if (base && model) {
-				auto it = std::find_if(lockDataMap.begin(), lockDataMap.end(), [&](const auto& data) {
-					return string::icontains(model->GetModel(), data.first);
-				});
-				if (it != lockDataMap.end()) {
-					lockType = it->first;
-					lockData = it->second;
-				}
-				if (!lockData) {
-					if (detail::is_underwater(ref)) {
-						if (it = lockDataMap.find("Underwater"); it != lockDataMap.end()) {
-							lockType = it->first;
-							lockData = it->second;
-						}
-					} else if (detail::has_snow(model)) {
-						if (it = lockDataMap.find("IceCastle"); it != lockDataMap.end()) {
-							lockType = it->first;
-							lockData = it->second;
-						}
+		if (base && model) {
+			auto it = std::ranges::find_if(lockDataMap, [&](const auto& data) {
+				return string::icontains(model->GetModel(), data.first);
+			});
+			if (it != lockDataMap.end()) {
+				lockType = it->first;
+				lockData = it->second;
+			}
+			if (!lockData) {
+				if (detail::is_underwater(ref)) {
+					if (it = lockDataMap.find("Underwater"); it != lockDataMap.end()) {
+						lockType = it->first;
+						lockData = it->second;
+					}
+				} else if (detail::has_snow(model)) {
+					if (it = lockDataMap.find("IceCastle"); it != lockDataMap.end()) {
+						lockType = it->first;
+						lockData = it->second;
 					}
 				}
-				if (lockType && lockData) {
-					const auto isDoor = base->Is(RE::FormType::Door);
-					if (detail::is_underwater(ref)) {
-						return isDoor ? lockData->doorWaterModel : lockData->chestWaterModel;
-					} else if (detail::has_snow(model)) {
-						return isDoor ? lockData->doorSnowModel : lockData->chestSnowModel;
-					}
-					return isDoor ? lockData->doorModel : lockData->chestModel;
+			}
+			if (lockType && lockData) {
+				const auto isDoor = base->Is(RE::FormType::Door);
+				if (detail::is_underwater(ref)) {
+					return isDoor ? lockData->door.waterModel : lockData->chest.waterModel;
 				}
+				if (detail::has_snow(model)) {
+					return isDoor ? lockData->door.snowModel : lockData->chest.snowModel;
+				}
+				return isDoor ? lockData->door.model : lockData->chest.model;
 			}
 		}
 
 		return a_fallbackPath;
+	}
+
+	std::string GetLockpickModel(const char* a_fallbackPath)
+	{
+		//reset
+		lockType = std::nullopt;
+		std::optional<LockData> lockData = std::nullopt;
+
+		std::string path(a_fallbackPath);
+
+		if (path == skeletonKey) {
+			return path;
+		}
+
+		const auto ref = RE::LockpickingMenu::GetTargetReference();
+		const auto base = ref ? ref->GetBaseObject() : nullptr;
+		const auto model = base ? base->As<RE::TESModel>() : nullptr;
+
+		if (base && model) {
+			const auto it = std::ranges::find_if(lockDataMap, [&](const auto& data) {
+				return string::icontains(model->GetModel(), data.first);
+			});
+			if (it != lockDataMap.end()) {
+				lockType = it->first;
+				lockData = it->second;
+			}
+			if (lockType && lockData) {
+				path = lockData->lockpickModel;
+			}
+		}
+
+		return path;
 	}
 
 	std::optional<SoundData> GetSoundData()
@@ -147,14 +196,41 @@ public:
 private:
 	struct detail
 	{
-		static void get_value(CSimpleIniA& a_ini, std::string& a_value, const char* a_section, const char* a_key, const std::string& a_default = std::string())
+		static void get_value(const CSimpleIniA& a_ini, std::string& a_value, const char* a_section, const char* a_key, const std::string& a_default = std::string())
 		{
 			a_value = a_ini.GetValue(a_section, a_key, a_default.empty() ? a_value.c_str() : a_default.c_str());
-		};
+		}
+
+		static void fill_default_lock(LockData& oldLock, const LockData& newLock)
+		{
+			if (oldLock.chest.model == defaultLock) {
+				oldLock.chest.model = newLock.chest.model;
+			}
+			if (oldLock.chest.waterModel == defaultLock) {
+				oldLock.chest.waterModel = newLock.chest.waterModel;
+			}
+			if (oldLock.chest.snowModel == defaultLock) {
+				oldLock.chest.snowModel = newLock.chest.snowModel;
+			}
+
+			if (oldLock.door.model == defaultLock) {
+				oldLock.door.model = newLock.door.model;
+			}
+			if (oldLock.door.waterModel == defaultLock) {
+				oldLock.door.waterModel = newLock.door.waterModel;
+			}
+			if (oldLock.door.snowModel == defaultLock) {
+				oldLock.door.snowModel = newLock.door.snowModel;
+			}
+
+			if (oldLock.lockpickModel == defaultLockPick) {
+				oldLock.lockpickModel = newLock.lockpickModel;
+			}
+		}
 
 		static bool has_snow(RE::TESModel* a_model)
 		{
-			auto modelSwap = a_model->GetAsModelTextureSwap();
+			const auto modelSwap = a_model->GetAsModelTextureSwap();
 			if (modelSwap && modelSwap->alternateTextures) {
 				std::span span(modelSwap->alternateTextures, modelSwap->numAlternateTextures);
 				for (const auto& texture : span) {
@@ -167,7 +243,7 @@ private:
 			return false;
 		}
 
-		static bool is_underwater(RE::TESObjectREFR* a_ref)
+		static bool is_underwater(const RE::TESObjectREFR* a_ref)
 		{
 			const auto waterLevel = a_ref->GetSubmergedWaterLevel(a_ref->GetPositionZ(), a_ref->GetParentCell());
 			return waterLevel >= 0.875f;
