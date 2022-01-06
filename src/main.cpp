@@ -2,27 +2,52 @@
 
 namespace Model
 {
-	struct RequestModel
+	namespace Lock
 	{
-		static std::uint8_t thunk(const char* a_modelPath, std::uintptr_t a_unk02, std::uintptr_t a_unk03)
+		struct RequestModel
 		{
-			std::string modelPath = Settings::GetSingleton()->GetLockModel(a_modelPath);
+			static std::uint8_t thunk(const char* a_modelPath, std::uintptr_t a_unk02, std::uintptr_t a_unk03)
+			{
+                const std::string modelPath = Settings::GetSingleton()->GetLockModel(a_modelPath);
 
-			return func(modelPath.c_str(), a_unk02, a_unk03);
-		}
-		static inline REL::Relocation<decltype(thunk)> func;
-	};
+				return func(modelPath.c_str(), a_unk02, a_unk03);
+			}
+			static inline REL::Relocation<decltype(thunk)> func;
+		};
+	}
+
+	namespace Lockpick
+	{
+		struct RequestModel
+		{
+			static std::uint8_t thunk(const char* a_modelPath, std::uintptr_t a_unk02, std::uintptr_t a_unk03)
+			{
+				const std::string modelPath = Settings::GetSingleton()->GetLockpickModel(a_modelPath);
+
+				return func(modelPath.c_str(), a_unk02, a_unk03);
+			}
+			static inline REL::Relocation<decltype(thunk)> func;
+		};
+	}
 
 	inline void Install()
 	{
-		REL::Relocation<std::uintptr_t> target{ REL::ID(51081),
+		REL::Relocation<std::uintptr_t> target{ REL::ID(51081) };
+
+		::stl::write_thunk_call<Lock::RequestModel>(target.address() + 
 #ifndef SKYRIMVR
 			0xC6
 #else
 			0xBB
 #endif
-		};
-		::stl::write_thunk_call<RequestModel>(target.address());
+			);
+	    ::stl::write_thunk_call<Lockpick::RequestModel>(target.address() + 
+#ifndef SKYRIMVR
+			0xA1
+#else
+			0x96
+#endif
+			);
 	}
 }
 
@@ -34,8 +59,7 @@ namespace Sound
 		{
 			std::string editorID = a_editorID;
 
-			auto soundData = Settings::GetSingleton()->GetSoundData();
-			if (soundData) {
+            if (const auto soundData = Settings::GetSingleton()->GetSoundData(); soundData) {
 				if (editorID == "UILockpickingCylinderSqueakA") {
 					editorID = soundData->UILockpickingCylinderSqueakA;
 				} else {
@@ -52,8 +76,8 @@ namespace Sound
 	{
 		static void thunk(const char* a_editorID)
 		{
-			auto soundData = Settings::GetSingleton()->GetSoundData();
-			std::string editorID = soundData ? soundData->UILockpickingCylinderStop : a_editorID;
+            const auto soundData = Settings::GetSingleton()->GetSoundData();
+            const std::string editorID = soundData ? soundData->UILockpickingCylinderStop : a_editorID;
 
 			return func(editorID.c_str());
 		}
@@ -64,8 +88,8 @@ namespace Sound
 	{
 		static void thunk(const char* a_editorID)
 		{
-			auto soundData = Settings::GetSingleton()->GetSoundData();
-			std::string editorID = soundData ? soundData->UILockpickingCylinderTurn : a_editorID;
+            const auto soundData = Settings::GetSingleton()->GetSoundData();
+            const std::string editorID = soundData ? soundData->UILockpickingCylinderTurn : a_editorID;
 
 			return func(editorID.c_str());
 		}
@@ -76,8 +100,8 @@ namespace Sound
 	{
 		static void thunk(const char* a_editorID)
 		{
-			auto soundData = Settings::GetSingleton()->GetSoundData();
-			std::string editorID = soundData ? soundData->UILockpickingPickMovement : a_editorID;
+            const auto soundData = Settings::GetSingleton()->GetSoundData();
+            const std::string editorID = soundData ? soundData->UILockpickingPickMovement : a_editorID;
 
 			return func(editorID.c_str());
 		}
@@ -88,8 +112,9 @@ namespace Sound
 	{
 		static void thunk(const char* a_editorID)
 		{
-			auto soundData = Settings::GetSingleton()->GetSoundData();
-			std::string editorID = soundData ? soundData->UILockpickingUnlock : a_editorID;
+            const auto soundData = Settings::GetSingleton()->GetSoundData();
+            const std::string editorID = soundData ? soundData->UILockpickingUnlock : a_editorID;
+
 			return func(editorID.c_str());
 		}
 		static inline REL::Relocation<decltype(thunk)> func;
@@ -143,7 +168,7 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface* a
 	logger::info(FMT_STRING("{} v{}"), Version::PROJECT, Version::NAME);
 
 	a_info->infoVersion = SKSE::PluginInfo::kVersion;
-	a_info->name = "Lock Replacer";
+	a_info->name = "Lock Variations";
 	a_info->version = Version::MAJOR;
 
 	if (a_skse->IsEditor()) {
@@ -171,7 +196,7 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 	logger::info("loaded plugin");
 
 	SKSE::Init(a_skse);
-	SKSE::AllocTrampoline(84);
+	SKSE::AllocTrampoline(98);
 
 	Settings::GetSingleton()->Load();
 
