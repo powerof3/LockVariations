@@ -8,7 +8,7 @@ namespace Model
 		{
 			static std::uint8_t thunk(const char* a_modelPath, std::uintptr_t a_unk02, std::uintptr_t a_unk03)
 			{
-                const std::string modelPath = Settings::GetSingleton()->GetLockModel(a_modelPath);
+				const std::string modelPath = Settings::GetSingleton()->GetLockModel(a_modelPath);
 
 				return func(modelPath.c_str(), a_unk02, a_unk03);
 			}
@@ -35,7 +35,7 @@ namespace Model
 		REL::Relocation<std::uintptr_t> target{ REL::ID(51081) };
 
 		stl::write_thunk_call<Lock::RequestModel>(target.address() + 0xC6);
-	    stl::write_thunk_call<Lockpick::RequestModel>(target.address() + 0xA1);
+		stl::write_thunk_call<Lockpick::RequestModel>(target.address() + 0xA1);
 	}
 }
 
@@ -47,7 +47,7 @@ namespace Sound
 		{
 			std::string editorID = a_editorID;
 
-            if (const auto soundData = Settings::GetSingleton()->GetSoundData(); soundData) {
+			if (const auto soundData = Settings::GetSingleton()->GetSoundData(); soundData) {
 				if (editorID == "UILockpickingCylinderSqueakA") {
 					editorID = soundData->UILockpickingCylinderSqueakA;
 				} else {
@@ -64,8 +64,8 @@ namespace Sound
 	{
 		static void thunk(const char* a_editorID)
 		{
-            const auto soundData = Settings::GetSingleton()->GetSoundData();
-            const std::string editorID = soundData ? soundData->UILockpickingCylinderStop : a_editorID;
+			const auto soundData = Settings::GetSingleton()->GetSoundData();
+			const std::string editorID = soundData ? soundData->UILockpickingCylinderStop : a_editorID;
 
 			return func(editorID.c_str());
 		}
@@ -76,8 +76,8 @@ namespace Sound
 	{
 		static void thunk(const char* a_editorID)
 		{
-            const auto soundData = Settings::GetSingleton()->GetSoundData();
-            const std::string editorID = soundData ? soundData->UILockpickingCylinderTurn : a_editorID;
+			const auto soundData = Settings::GetSingleton()->GetSoundData();
+			const std::string editorID = soundData ? soundData->UILockpickingCylinderTurn : a_editorID;
 
 			return func(editorID.c_str());
 		}
@@ -88,8 +88,8 @@ namespace Sound
 	{
 		static void thunk(const char* a_editorID)
 		{
-            const auto soundData = Settings::GetSingleton()->GetSoundData();
-            const std::string editorID = soundData ? soundData->UILockpickingPickMovement : a_editorID;
+			const auto soundData = Settings::GetSingleton()->GetSoundData();
+			const std::string editorID = soundData ? soundData->UILockpickingPickMovement : a_editorID;
 
 			return func(editorID.c_str());
 		}
@@ -100,8 +100,8 @@ namespace Sound
 	{
 		static void thunk(const char* a_editorID)
 		{
-            const auto soundData = Settings::GetSingleton()->GetSoundData();
-            const std::string editorID = soundData ? soundData->UILockpickingUnlock : a_editorID;
+			const auto soundData = Settings::GetSingleton()->GetSoundData();
+			const std::string editorID = soundData ? soundData->UILockpickingUnlock : a_editorID;
 
 			return func(editorID.c_str());
 		}
