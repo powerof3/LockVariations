@@ -15,6 +15,7 @@
 	* You need to build from the powerof3/dev branch
 	* Add this as as an environment variable `CommonLibSSEPath`
 * [CommonLibVR](https://github.com/alandtse/CommonLibVR/tree/vr)
+	* You need to build from the vr branch
 	* Add this as as an environment variable `CommonLibVRPath`
 
 ## User Requirements
@@ -31,17 +32,21 @@
 ```
 git clone https://github.com/powerof3/LockVariations.git
 cd LockVariations
+# pull commonlib /extern to override the path settings
+git submodule init
+# to update submodules to checked in build
+git submodule update
 ```
+
 ### SSE
 ```
-cmake -B build -S .
+cmake --preset vs2022-windows-vcpkg
+cmake --build build --config Release
 ```
-Open build/po3_LockVariations.sln in Visual Studio to build dll.
-
 ### VR
 ```
-cmake -B build2 -S . -DBUILD_SKYRIMVR=On
+cmake --preset vs2022-windows-vcpkg-vr
+cmake --build buildvr --config Release
 ```
-Open build2/po3_LockVariations.sln in Visual Studio to build dll.
 ## License
 [MIT](LICENSE)
