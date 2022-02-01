@@ -1,11 +1,12 @@
 {
   "name": "lock-variations",
-  "version-string": "2.1.0",
+  "version-string": "3.0.0",
   "description": "Lock Variations",
   "homepage": "",
   "license": "MIT",
   "dependencies": [
     "boost-stl-interfaces",
+    "robin-hood-hashing",
     "rsm-binary-io",
     "simpleini",
     "spdlog",
