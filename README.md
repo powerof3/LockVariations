@@ -1,7 +1,8 @@
 # Lock Variations
 
-SKSE plugin that enables unique lock models
+[SKSE plugin](https://www.nexusmods.com/skyrimspecialedition/mods/58224) that enables unique lock models
 
+[SKSEVR version](https://www.nexusmods.com/skyrimspecialedition/mods/58298)
 ## Requirements
 * [CMake](https://cmake.org/)
 	* Add this to your `PATH`
@@ -13,7 +14,15 @@ SKSE plugin that enables unique lock models
 * [CommonLibSSE](https://github.com/powerof3/CommonLibSSE/tree/dev)
 	* You need to build from the powerof3/dev branch
 	* Add this as as an environment variable `CommonLibSSEPath`
+* [CommonLibVR](https://github.com/alandtse/CommonLibVR/tree/vr)
+	* You need to build from the vr branch
+	* Add this as as an environment variable `CommonLibVRPath`
 
+## User Requirements
+* [Address Library for SKSE](https://www.nexusmods.com/skyrimspecialedition/mods/32444)
+	* Needed for SSE
+* [VR Address Library for SKSEVR](https://www.nexusmods.com/skyrimspecialedition/mods/58101)
+	* Needed for VR
 ## Register Visual Studio as a Generator
 * Open `x64 Native Tools Command Prompt`
 * Run `cmake`
@@ -23,7 +32,21 @@ SKSE plugin that enables unique lock models
 ```
 git clone https://github.com/powerof3/LockVariations.git
 cd LockVariations
-cmake -B build -S .
+# pull commonlib /extern to override the path settings
+git submodule init
+# to update submodules to checked in build
+git submodule update
+```
+
+### SSE
+```
+cmake --preset vs2022-windows-vcpkg
+cmake --build build --config Release
+```
+### VR
+```
+cmake --preset vs2022-windows-vcpkg-vr
+cmake --build buildvr --config Release
 ```
 ## License
 [MIT](LICENSE)
