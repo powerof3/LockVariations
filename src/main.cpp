@@ -34,8 +34,20 @@ namespace Model
 	{
 		REL::Relocation<std::uintptr_t> target{ REL::ID(51081) };
 
-		stl::write_thunk_call<Lock::RequestModel>(target.address() + 0xC6);
-		stl::write_thunk_call<Lockpick::RequestModel>(target.address() + 0xA1);
+		stl::write_thunk_call<Lock::RequestModel>(target.address() +
+#ifndef SKYRIMVR
+			0xC6
+#else
+			0xBB
+#endif
+			);
+	    stl::write_thunk_call<Lockpick::RequestModel>(target.address() +
+#ifndef SKYRIMVR
+			0xA1
+#else
+			0x96
+#endif
+			);
 	}
 }
 
@@ -111,15 +123,27 @@ namespace Sound
 	inline void Install()
 	{
 		REL::Relocation<std::uintptr_t> update_lock_angle{ REL::ID(51096) };
+#ifndef SKYRIMVR
 		stl::write_thunk_call<CylinderSqueak>(update_lock_angle.address() + 0x159);
 		stl::write_thunk_call<CylinderStop>(update_lock_angle.address() + 0xD9);
 		stl::write_thunk_call<LockpickingUnlock>(update_lock_angle.address() + 0xA1);
+#else
+		stl::write_thunk_call<CylinderSqueak>(update_lock_angle.address() + 0x19E);
+		stl::write_thunk_call<CylinderStop>(update_lock_angle.address() + 0x11E);
+		stl::write_thunk_call<LockpickingUnlock>(update_lock_angle.address() + 0xA1);
+#endif
 
 		REL::Relocation<std::uintptr_t> rotate_lock{ REL::ID(51098) };
 		stl::write_thunk_call<CylinderTurn>(rotate_lock.address() + 0x33);
 
 		REL::Relocation<std::uintptr_t> update_pick_angle{ REL::ID(51094) };
-		stl::write_thunk_call<PickMovement>(update_pick_angle.address() + 0x13F);
+		stl::write_thunk_call<PickMovement>(update_pick_angle.address() +
+#ifndef SKYRIMVR
+											0x13F
+#else
+											0x15E
+#endif
+		);
 	}
 }
 
@@ -153,7 +177,13 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface* a
 	}
 
 	const auto ver = a_skse->RuntimeVersion();
-	if (ver < SKSE::RUNTIME_1_5_39) {
+	if (ver <
+#ifndef SKYRIMVR
+		SKSE::RUNTIME_1_5_39
+#else
+		SKSE::RUNTIME_VR_1_4_15
+#endif
+	) {
 		logger::critical(FMT_STRING("Unsupported runtime version {}"), ver.string());
 		return false;
 	}
