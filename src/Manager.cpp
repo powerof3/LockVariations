@@ -2,7 +2,9 @@
 
 bool Manager::Load()
 {
-	std::vector<std::string> configs;
+	logger::info("{:*^30}", "INI");
+
+    std::vector<std::string> configs;
 
 	constexpr auto suffix = "_LID"sv;
 
@@ -79,6 +81,10 @@ bool Manager::Load()
 		}
 	}
 
+	logger::info("{:*^30}", "RESULTS");
+
+	logger::info("{} lock types found", lockDataMap.size());
+
 	return !lockDataMap.empty();
 }
 
@@ -121,7 +127,7 @@ std::string Manager::GetLockModel(const char* a_fallbackPath)
 				return a_lockType.modelPath == a_model;
 			};
 
-			if (detail::is_underwater(ref)) {
+			if (detail::is_underwater()) {
 				it = std::ranges::find_if(lockDataMap, [&](const auto& data) {
 					return get_matching_lock_by_model(data.first, "Underwater"sv);
 				});
@@ -138,8 +144,8 @@ std::string Manager::GetLockModel(const char* a_fallbackPath)
 
 		if (currentLockType && lockData) {
 			const auto isDoor = base->Is(RE::FormType::Door);
-			if (detail::is_underwater(ref)) {
-				return isDoor ?
+			if (detail::is_underwater()) {
+			    return isDoor ?
 				           lockData->door.waterModel :
                            lockData->chest.waterModel;
 			}

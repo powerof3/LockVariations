@@ -112,9 +112,10 @@ private:
 			return false;
 		}
 
-		static bool is_underwater(const RE::TESObjectREFR* a_ref)
+		static bool is_underwater()
 		{
-			return a_ref->IsPointSubmergedMoreThan(a_ref->GetPosition(), a_ref->GetParentCell(), 0.875f);
+			const auto waterSystem = RE::TESWaterSystem::GetSingleton();
+			return waterSystem && waterSystem->playerUnderwater;
 		}
 	};
 
