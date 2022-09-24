@@ -9,7 +9,16 @@ namespace Model
 		{
 			static std::uint8_t thunk(const char* a_modelPath, std::uintptr_t a_unk02, std::uintptr_t a_unk03)
 			{
-				return func(Manager::GetSingleton()->GetLockModel(a_modelPath).c_str(), a_unk02, a_unk03);
+				auto path = Manager::GetSingleton()->GetLockModel(a_modelPath);
+
+			    if (path != a_modelPath) {
+					if (const auto ref = RE::LockpickingMenu::GetTargetReference()) {
+						logger::info("{}", ref->GetName());
+						logger::info("	Lock : {} -> {}", a_modelPath, path);
+					}
+			    }
+
+			    return func(path.c_str(), a_unk02, a_unk03);
 			}
 			static inline REL::Relocation<decltype(thunk)> func;
 		};
@@ -21,7 +30,13 @@ namespace Model
 		{
 			static std::uint8_t thunk(const char* a_modelPath, std::uintptr_t a_unk02, std::uintptr_t a_unk03)
 			{
-				return func(Manager::GetSingleton()->GetLockpickModel(a_modelPath).c_str(), a_unk02, a_unk03);
+				auto path = Manager::GetSingleton()->GetLockpickModel(a_modelPath);
+
+				if (path != a_modelPath) {
+					logger::info("	Lockpick : {} -> {}", a_modelPath, path);
+				}
+
+				return func(path.c_str(), a_unk02, a_unk03);
 			}
 			static inline REL::Relocation<decltype(thunk)> func;
 		};

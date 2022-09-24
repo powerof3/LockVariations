@@ -1,6 +1,6 @@
 #include "Manager.h"
 
-bool Manager::Load()
+bool Manager::LoadLocks()
 {
 	logger::info("{:*^30}", "INI");
 
@@ -84,6 +84,8 @@ bool Manager::Load()
 	logger::info("{:*^30}", "RESULTS");
 
 	logger::info("{} lock types found", lockDataMap.size());
+
+	logger::info("{:*^30}", "INFO");
 
 	return !lockDataMap.empty();
 }

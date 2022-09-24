@@ -4,7 +4,7 @@
 void MessageHandler(SKSE::MessagingInterface::Message* a_message)
 {
 	if (a_message->type == SKSE::MessagingInterface::kPostLoad) {
-		if (Manager::GetSingleton()->Load()) {
+		if (Manager::GetSingleton()->LoadLocks()) {
 			Model::Install();
 			Sound::Install();
 		}

@@ -81,7 +81,7 @@ public:
 		return std::addressof(singleton);
 	}
 
-	bool Load();
+	bool LoadLocks();
 
 	std::string GetLockModel(const char* a_fallbackPath);
 	std::string GetLockpickModel(const char* a_fallbackPath);
