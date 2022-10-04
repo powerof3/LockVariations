@@ -6,7 +6,6 @@
   "license": "MIT",
   "dependencies": [
     "boost-stl-interfaces",
-    "robin-hood-hashing",
     "rsm-binary-io",
     "simpleini",
     "spdlog",
