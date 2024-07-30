@@ -3,19 +3,24 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 
+#include <ranges>
+
 #include "RE/Skyrim.h"
 #include "SKSE/SKSE.h"
 
-#include <ranges>
-#include <SimpleIni.h>
+#include <ClibUtil/simpleINI.hpp>
+#include <ClibUtil/distribution.hpp>
+#include <ClibUtil/singleton.hpp>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <xbyak/xbyak.h>
 
 #define DLLEXPORT __declspec(dllexport)
 
 namespace logger = SKSE::log;
-namespace string = SKSE::stl::string;
+namespace string = clib_util::string;
+
 using namespace std::literals;
+using namespace clib_util::singleton;
 
 namespace stl
 {
