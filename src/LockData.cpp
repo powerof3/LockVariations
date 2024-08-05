@@ -37,7 +37,7 @@ namespace Lock
 		if (a_section.empty()) {
 			return;
 		}
-		
+
 		if (auto lockTypeStrs = string::split(a_section, "|"); lockTypeStrs.size() > 1) {
 			modelPath = lockTypeStrs[0];
 			locationID = detail::GetFormID(lockTypeStrs[1]);
@@ -65,7 +65,7 @@ namespace Lock
 		if (a_section.empty()) {
 			return;
 		}
-		
+
 		ini::get_value(a_ini, UILockpickingCylinderSqueakA, a_section.c_str(), "CylinderSqueakA");
 		ini::get_value(a_ini, UILockpickingCylinderSqueakB, a_section.c_str(), "CylinderSqueakB");
 		ini::get_value(a_ini, UILockpickingCylinderStop, a_section.c_str(), "CylinderStop");
@@ -104,7 +104,7 @@ namespace Lock
 						   } },
 				id);
 			return isValid;
-			});
+		});
 
 		if (result) {
 			if (flags == Flags::kUnderwater) {
