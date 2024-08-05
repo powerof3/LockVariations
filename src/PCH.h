@@ -8,19 +8,35 @@
 #include "RE/Skyrim.h"
 #include "SKSE/SKSE.h"
 
+#include <MergeMapperPluginAPI.h>
+
 #include <ClibUtil/simpleINI.hpp>
 #include <ClibUtil/distribution.hpp>
 #include <ClibUtil/singleton.hpp>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <xbyak/xbyak.h>
 
+#include <ClibUtil/editorID.hpp>
+
 #define DLLEXPORT __declspec(dllexport)
 
 namespace logger = SKSE::log;
+namespace dist = clib_util::distribution;
+namespace ini = clib_util::ini;
 namespace string = clib_util::string;
+namespace edid = clib_util::editorID;
 
 using namespace std::literals;
 using namespace clib_util::singleton;
+
+// for visting variants
+template <class... Ts>
+struct overload : Ts...
+{
+	using Ts::operator()...;
+};
+
+using FormIDStr = std::variant<RE::FormID, std::string>;
 
 namespace stl
 {

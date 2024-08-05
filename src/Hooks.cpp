@@ -13,7 +13,7 @@ namespace Model
 
 				if (path != a_modelPath) {
 					if (const auto ref = RE::LockpickingMenu::GetTargetReference()) {
-						logger::info("{}", ref->GetName());
+						logger::info("{}", ref->GetBaseObject() ? edid::get_editorID(ref->GetBaseObject()) : ref->GetName());
 						logger::info("\tLock : {} -> {}", a_modelPath, path);
 					}
 				}
@@ -59,7 +59,7 @@ namespace Sound
 		{
 			std::string editorID = a_editorID;
 
-			if (const auto soundData = Manager::GetSingleton()->GetSoundData()) {
+			if (const auto& soundData = Manager::GetSingleton()->GetSounds()) {
 				if (editorID == "UILockpickingCylinderSqueakA") {
 					editorID = soundData->UILockpickingCylinderSqueakA;
 				} else {
@@ -76,7 +76,7 @@ namespace Sound
 	{
 		static void thunk(const char* a_editorID)
 		{
-			const auto        soundData = Manager::GetSingleton()->GetSoundData();
+			const auto&       soundData = Manager::GetSingleton()->GetSounds();
 			const std::string editorID = soundData ?
 			                                 soundData->UILockpickingCylinderStop :
 			                                 a_editorID;
@@ -90,7 +90,7 @@ namespace Sound
 	{
 		static void thunk(const char* a_editorID)
 		{
-			const auto        soundData = Manager::GetSingleton()->GetSoundData();
+			const auto&       soundData = Manager::GetSingleton()->GetSounds();
 			const std::string editorID = soundData ?
 			                                 soundData->UILockpickingCylinderTurn :
 			                                 a_editorID;
@@ -104,7 +104,7 @@ namespace Sound
 	{
 		static void thunk(const char* a_editorID)
 		{
-			const auto        soundData = Manager::GetSingleton()->GetSoundData();
+			const auto&       soundData = Manager::GetSingleton()->GetSounds();
 			const std::string editorID = soundData ?
 			                                 soundData->UILockpickingPickMovement :
 			                                 a_editorID;
@@ -118,7 +118,7 @@ namespace Sound
 	{
 		static void thunk(const char* a_editorID)
 		{
-			const auto        soundData = Manager::GetSingleton()->GetSoundData();
+			const auto&       soundData = Manager::GetSingleton()->GetSounds();
 			const std::string editorID = soundData ?
 			                                 soundData->UILockpickingUnlock :
 			                                 a_editorID;
