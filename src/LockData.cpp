@@ -77,7 +77,10 @@ namespace Lock
 	Model::Condition::Condition(const std::string& a_id, const std::string& a_flags)
 	{
 		if (dist::is_valid_entry(a_id)) {
-			id = detail::GetFormIDStr(a_id);
+			auto vec = string::split(a_id, ",");
+			for (auto& id : vec) {
+				ids.push_back(detail::GetFormIDStr(id));
+			}
 		}
 		if (dist::is_valid_entry(a_flags)) {
 			if (a_flags == "underwater") {
@@ -90,14 +93,18 @@ namespace Lock
 	{
 		bool result = false;
 
-		std::visit(overload{
-					   [&](RE::FormID a_formID) {
-						   result = IsValidImpl(a_checker, a_formID);
-					   },
-					   [&](const std::string& a_edid) {
-						   result = IsValidImpl(a_checker, a_edid);
-					   } },
-			id);
+		result = std::any_of(ids.begin(), ids.end(), [&](auto& id) {
+			bool isValid = false;
+			std::visit(overload{
+						   [&](RE::FormID a_formID) {
+							   isValid = IsValidImpl(a_checker, a_formID);
+						   },
+						   [&](const std::string& a_edid) {
+							   isValid = IsValidImpl(a_checker, a_edid);
+						   } },
+				id);
+			return isValid;
+			});
 
 		if (result) {
 			if (flags == Flags::kUnderwater) {

@@ -22,6 +22,7 @@ bool Manager::LoadLocks()
 
 		CSimpleIniA ini;
 		ini.SetUnicode();
+		ini.SetMultiKey();
 
 		if (const auto rc = ini.LoadFile(path.c_str()); rc < 0) {
 			logger::error("\tcouldn't read INI");

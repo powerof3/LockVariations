@@ -63,8 +63,8 @@ namespace Lock
 			[[nodiscard]] static bool IsValidImpl(const ConditionChecker& a_checker, const std::string& a_edid);
 
 			// members
-			FormIDStr id{};  // textureset/chest/door
-			Flags     flags{ Flags::kNone };
+			std::vector<FormIDStr> ids{};  // textureset/chest/door
+			Flags                  flags{ Flags::kNone };
 		};
 
 		// members
@@ -73,7 +73,7 @@ namespace Lock
 	};
 
 	struct Variant
-	{	
+	{
 		// members
 		Type               type{};
 		std::vector<Model> chests{};
