@@ -54,6 +54,8 @@ bool Manager::LoadLocks()
 					}
 				}
 
+				variant.SortModels();
+
 				lockVariants.emplace_back(variant);
 			}
 		}

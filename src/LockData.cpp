@@ -198,4 +198,18 @@ namespace Lock
 			return a_variant.chests;
 		}
 	}
+
+	void Variant::SortModels()
+	{
+		//shift conditional models to top
+		std::ranges::stable_partition(chests, [](const Lock::Model& a_lhs) {
+			return a_lhs.condition.has_value();
+		});
+		std::ranges::stable_partition(doors, [](const Lock::Model& a_lhs) {
+			return a_lhs.condition.has_value();
+		});
+		std::ranges::stable_partition(lockpicks, [](const Lock::Model& a_lhs) {
+			return a_lhs.condition.has_value();
+		});
+	}
 }

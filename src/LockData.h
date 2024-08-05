@@ -74,6 +74,8 @@ namespace Lock
 
 	struct Variant
 	{
+		void SortModels();
+		
 		// members
 		Type               type{};
 		std::vector<Model> chests{};
