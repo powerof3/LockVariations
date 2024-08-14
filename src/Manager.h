@@ -6,6 +6,7 @@ class Manager : public ISingleton<Manager>
 {
 public:
 	bool LoadLocks();
+	void InitLockForms();
 
 	std::string GetLockModel(const char* a_fallbackPath);
 	std::string GetLockpickModel(const char* a_fallbackPath);
@@ -14,7 +15,7 @@ public:
 
 private:
 	void Sanitize(const std::string& a_path);
-	
+
 	// members
 	std::vector<Lock::Variant> lockVariants;
 	std::optional<Lock::Sound> currentSound;

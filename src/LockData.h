@@ -19,11 +19,14 @@ namespace Lock
 		Type() = default;
 		Type(const std::string& a_section);
 
+		void               InitLocation();
 		[[nodiscard]] bool IsValid(const ConditionChecker& a_checker) const;
 
 		// members
 		std::string modelPath{};
-		RE::FormID  locationID{ 0 };
+
+		RE::FormID  locationID{};
+		std::string locationStr{};
 	};
 
 	struct Sound
@@ -57,6 +60,7 @@ namespace Lock
 
 			Condition(const std::string& a_id, const std::string& a_flags);
 
+			void               InitForms();
 			[[nodiscard]] bool IsValid(const ConditionChecker& a_checker) const;
 
 			[[nodiscard]] static bool IsValidImpl(const ConditionChecker& a_checker, RE::FormID a_formID);
@@ -67,6 +71,8 @@ namespace Lock
 			Flags                  flags{ Flags::kNone };
 		};
 
+		void InitForms();
+
 		// members
 		std::optional<Condition> condition{};
 		std::string              model{ defaultLock };
@@ -75,7 +81,16 @@ namespace Lock
 	struct Variant
 	{
 		void SortModels();
-		
+		void InitForms();
+
+		template <typename Func, typename... Args>
+		void ForEachModelType(Func&& func, Args&&... args)
+		{
+			func(chests, std::forward<Args>(args)...);
+			func(doors, std::forward<Args>(args)...);
+			func(lockpicks, std::forward<Args>(args)...);
+		}
+
 		// members
 		Type               type{};
 		std::vector<Model> chests{};

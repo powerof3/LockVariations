@@ -3,11 +3,32 @@
 
 void MessageHandler(SKSE::MessagingInterface::Message* a_message)
 {
-	if (a_message->type == SKSE::MessagingInterface::kPostLoad) {
-		if (Manager::GetSingleton()->LoadLocks()) {
-			Model::Install();
-			Sound::Install();
+	switch (a_message->type) {
+	case SKSE::MessagingInterface::kPostLoad:
+		{
+			if (Manager::GetSingleton()->LoadLocks()) {
+				Model::Install();
+				Sound::Install();
+			}
 		}
+		break;
+	case SKSE::MessagingInterface::kPostPostLoad:
+		{
+			logger::info("{:*^30}", "MERGES");
+			MergeMapperPluginAPI::GetMergeMapperInterface001();  // Request interface
+			if (g_mergeMapperInterface) {                        // Use Interface
+				const auto version = g_mergeMapperInterface->GetBuildNumber();
+				logger::info("\tGot MergeMapper interface buildnumber {}", version);
+			} else {
+				logger::info("INFO - MergeMapper not detected");
+			}
+		}
+		break;
+	case SKSE::MessagingInterface::kDataLoaded:
+		Manager::GetSingleton()->InitLockForms();
+		break;
+	default:
+		break;
 	}
 }
 

@@ -73,11 +73,19 @@ bool Manager::LoadLocks()
 		return !a_lhs.type.modelPath.empty();
 	});
 
-	logger::info("{:*^30}", "RESULTS");
-	logger::info("{} lock entries", lockVariants.size());
-	logger::info("{:*^30}", "INFO");
-
 	return !lockVariants.empty();
+}
+
+void Manager::InitLockForms()
+{
+	logger::info("{:*^30}", "DATA LOAD");
+	
+	for (auto& variant : lockVariants) {
+		variant.InitForms();
+	}
+
+	logger::info("Loaded {} lock entries", lockVariants.size());
+	logger::info("{:*^30}", "INFO");
 }
 
 // hack

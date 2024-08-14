@@ -40,9 +40,16 @@ namespace Lock
 
 		if (auto lockTypeStrs = string::split(a_section, "|"); lockTypeStrs.size() > 1) {
 			modelPath = lockTypeStrs[0];
-			locationID = detail::GetFormID(lockTypeStrs[1]);
+			locationStr = lockTypeStrs[1];
 		} else {
 			modelPath = lockTypeStrs[0];
+		}
+	}
+
+	void Type::InitLocation()
+	{
+		if (!locationStr.empty()) {
+			locationID = detail::GetFormID(locationStr);
 		}
 	}
 
@@ -79,13 +86,20 @@ namespace Lock
 		if (dist::is_valid_entry(a_id)) {
 			auto vec = string::split(a_id, ",");
 			for (auto& id : vec) {
-				ids.push_back(detail::GetFormIDStr(id));
+				ids.push_back(id);
 			}
 		}
 		if (dist::is_valid_entry(a_flags)) {
 			if (a_flags == "underwater") {
 				flags = Flags::kUnderwater;
 			}
+		}
+	}
+
+	void Model::Condition::InitForms()
+	{
+		for (auto& id : ids) {
+			id = detail::GetFormIDStr(std::get<std::string>(id));
 		}
 	}
 
@@ -161,6 +175,13 @@ namespace Lock
 		}
 	}
 
+	void Model::InitForms()
+	{
+		if (condition) {
+			condition->InitForms();
+		}
+	}
+
 	ConditionChecker::ConditionChecker(RE::TESObjectREFR* a_ref, RE::TESBoundObject* a_base, RE::TESModel* a_model) :
 		base(a_base),
 		location(a_ref->GetCurrentLocation()),
@@ -202,14 +223,21 @@ namespace Lock
 	void Variant::SortModels()
 	{
 		//shift conditional models to top
-		std::ranges::stable_partition(chests, [](const Lock::Model& a_lhs) {
-			return a_lhs.condition.has_value();
+		ForEachModelType([&](std::vector<Lock::Model>& models) {
+			std::ranges::stable_partition(models, [](const Lock::Model& model) {
+				return model.condition.has_value();
+			});
 		});
-		std::ranges::stable_partition(doors, [](const Lock::Model& a_lhs) {
-			return a_lhs.condition.has_value();
-		});
-		std::ranges::stable_partition(lockpicks, [](const Lock::Model& a_lhs) {
-			return a_lhs.condition.has_value();
+	}
+
+	void Variant::InitForms()
+	{
+		type.InitLocation();
+
+		ForEachModelType([&](std::vector<Lock::Model>& models) {
+			for (auto& model : models) {
+				model.InitForms();
+			}
 		});
 	}
 }
