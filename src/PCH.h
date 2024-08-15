@@ -10,10 +10,11 @@
 
 #include <MergeMapperPluginAPI.h>
 
-#include <ClibUtil/simpleINI.hpp>
 #include <ClibUtil/distribution.hpp>
+#include <ClibUtil/simpleINI.hpp>
 #include <ClibUtil/singleton.hpp>
 #include <spdlog/sinks/basic_file_sink.h>
+#include <srell.hpp>
 #include <xbyak/xbyak.h>
 
 #include <ClibUtil/editorID.hpp>

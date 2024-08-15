@@ -2,60 +2,30 @@
 
 namespace Lock
 {
-	RE::FormID detail::GetFormID(const std::string& a_str)
-	{
-		if (const auto splitID = string::split(a_str, "~"); splitID.size() == 2) {
-			const auto  formID = string::to_num<RE::FormID>(splitID[0], true);
-			const auto& modName = splitID[1];
-			if (g_mergeMapperInterface) {
-				const auto [mergedModName, mergedFormID] = g_mergeMapperInterface->GetNewFormID(modName.c_str(), formID);
-				return RE::TESDataHandler::GetSingleton()->LookupFormID(mergedFormID, mergedModName);
-			} else {
-				return RE::TESDataHandler::GetSingleton()->LookupFormID(formID, modName);
-			}
-		}
-		if (string::is_only_hex(a_str, true)) {
-			return string::to_num<RE::FormID>(a_str, true);
-		}
-		if (const auto form = RE::TESForm::LookupByEditorID(a_str)) {
-			return form->GetFormID();
-		}
-		return static_cast<RE::FormID>(0);
-	}
-
-	FormIDStr detail::GetFormIDStr(const std::string& a_str)
-	{
-		auto formID = GetFormID(a_str);
-		if (formID != 0) {
-			return formID;
-		}
-		return a_str;
-	}
-
 	Type::Type(const std::string& a_section)
 	{
 		if (a_section.empty()) {
 			return;
 		}
 
-		if (auto lockTypeStrs = string::split(a_section, "|"); lockTypeStrs.size() > 1) {
-			modelPath = lockTypeStrs[0];
+		auto lockTypeStrs = string::split(a_section, "|"); 
+
+		modelPath = util::SanitizeModel(lockTypeStrs[0]);
+		if (lockTypeStrs.size() > 1) {
 			locationStr = lockTypeStrs[1];
-		} else {
-			modelPath = lockTypeStrs[0];
 		}
 	}
 
 	void Type::InitLocation()
 	{
 		if (!locationStr.empty()) {
-			locationID = detail::GetFormID(locationStr);
+			locationID = util::GetFormID(locationStr);
 		}
 	}
 
 	bool Type::IsValid(const ConditionChecker& a_checker) const
 	{
-		if (!modelPath.empty() && !string::icontains(a_checker.modelPath, modelPath)) {
+		if (!modelPath.empty() && !a_checker.modelPath.contains(modelPath)) {
 			return false;
 		}
 
@@ -99,7 +69,7 @@ namespace Lock
 	void Model::Condition::InitForms()
 	{
 		for (auto& id : ids) {
-			id = detail::GetFormIDStr(std::get<std::string>(id));
+			id = util::GetFormIDStr(std::get<std::string>(id), true);
 		}
 	}
 
@@ -153,10 +123,10 @@ namespace Lock
 		return false;
 	}
 
-	bool Model::Condition::IsValidImpl(const ConditionChecker& a_checker, const std::string& a_edid)
+	bool Model::Condition::IsValidImpl(const ConditionChecker& a_checker, const std::string& a_path)
 	{
 		for (auto& [diffuse, textureset] : a_checker.textureSet) {
-			if (string::icontains(diffuse, a_edid)) {
+			if (diffuse.contains(a_path)) {
 				return true;
 			}
 		}
@@ -185,12 +155,13 @@ namespace Lock
 	ConditionChecker::ConditionChecker(RE::TESObjectREFR* a_ref, RE::TESBoundObject* a_base, RE::TESModel* a_model) :
 		base(a_base),
 		location(a_ref->GetCurrentLocation()),
-		modelPath(a_model->GetModel())
+		modelPath(util::SanitizeModel(a_model->GetModel()))
 	{
 		if (const auto modelSwap = a_model->GetAsModelTextureSwap(); modelSwap && modelSwap->alternateTextures && modelSwap->numAlternateTextures > 0) {
 			std::span span(modelSwap->alternateTextures, modelSwap->numAlternateTextures);
 			for (auto& txst : span) {
-				textureSet.emplace_back(txst.textureSet->textures[RE::BSTextureSet::Texture::kDiffuse].textureName.c_str(), txst.textureSet);
+				auto diffuse = util::SanitizeTexture(txst.textureSet->textures[RE::BSTextureSet::Texture::kDiffuse].textureName.c_str());
+				textureSet.emplace_back(std::move(diffuse), txst.textureSet);
 			}
 		}
 	}

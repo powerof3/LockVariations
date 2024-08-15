@@ -134,6 +134,7 @@ else ()
 endif()
 
 find_path(CLIB_UTIL_INCLUDE_DIRS "ClibUtil/utils.hpp")
+find_path(SRELL_INCLUDE_DIRS "srell.hpp")
 find_path(MERGEMAPPER_INCLUDE_DIRS "MergeMapperPluginAPI.h")
 
 # ---- Add source files ----
@@ -189,6 +190,7 @@ target_include_directories(
 		${CMAKE_CURRENT_SOURCE_DIR}/src
 		${CLIB_UTIL_INCLUDE_DIRS}
 		${MERGEMAPPER_INCLUDE_DIRS}
+		${SRELL_INCLUDE_DIRS}
 )
 
 target_link_libraries(

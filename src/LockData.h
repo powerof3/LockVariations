@@ -1,16 +1,12 @@
 #pragma once
 
+#include "Util.h"
+
 namespace Lock
 {
 	inline std::string_view defaultLock{ "Interface/Lockpicking/LockPickShiv01.nif"sv };
 	inline std::string_view defaultLockPick{ "Interface/Lockpicking/LockPick01.nif"sv };
 	inline std::string_view skeletonKey{ "Interface/Lockpicking/LockPickSkeletonKey01.nif"sv };
-
-	struct detail
-	{
-		static RE::FormID GetFormID(const std::string& a_str);
-		static FormIDStr  GetFormIDStr(const std::string& a_str);
-	};
 
 	struct ConditionChecker;
 
@@ -64,7 +60,7 @@ namespace Lock
 			[[nodiscard]] bool IsValid(const ConditionChecker& a_checker) const;
 
 			[[nodiscard]] static bool IsValidImpl(const ConditionChecker& a_checker, RE::FormID a_formID);
-			[[nodiscard]] static bool IsValidImpl(const ConditionChecker& a_checker, const std::string& a_edid);
+			[[nodiscard]] static bool IsValidImpl(const ConditionChecker& a_checker, const std::string& a_path);
 
 			// members
 			std::vector<FormIDStr> ids{};  // textureset/chest/door
@@ -116,6 +112,6 @@ namespace Lock
 		RE::TESBoundObject*  base{};
 		RE::BGSLocation*     location{};
 		std::string          modelPath{};
-		std::vector<Texture> textureSet;
+		std::vector<Texture> textureSet{};
 	};
 }
