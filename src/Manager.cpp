@@ -65,7 +65,7 @@ bool Manager::LoadLocks()
 		if (a_lhs.type.modelPath != a_rhs.type.modelPath) {
 			return a_lhs.type.modelPath < a_rhs.type.modelPath;
 		}
-		return a_lhs.type.locationID > a_rhs.type.locationID;  //biggest to smallest/empty
+		return a_lhs.type.locationStr > a_rhs.type.locationStr;  //biggest to smallest/empty
 	});
 	
 	// shift entries without model path condition to bottom
