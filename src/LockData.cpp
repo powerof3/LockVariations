@@ -90,11 +90,9 @@ namespace Lock
 			return isValid;
 		});
 
-		if (result) {
 			if (flags == Flags::kUnderwater) {
 				result = RE::TESWaterSystem::GetSingleton()->playerUnderwater;
 			}
-		}
 
 		return result;
 	}
