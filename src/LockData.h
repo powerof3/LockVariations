@@ -15,6 +15,20 @@ namespace Lock
 		Type() = default;
 		Type(const std::string& a_section);
 
+		bool operator<(const Type& a_rhs) const
+		{	
+			if (modelPath.empty() && !a_rhs.modelPath.empty()) {
+				return false;
+			}
+			if (!modelPath.empty() && a_rhs.modelPath.empty()) {
+				return true;
+			}
+			if (modelPath != a_rhs.modelPath) {
+				return modelPath < a_rhs.modelPath;
+			}
+			return locationStr > a_rhs.locationStr;  //biggest to smallest/empty
+		}
+
 		void               InitLocation();
 		[[nodiscard]] bool IsValid(const ConditionChecker& a_checker) const;
 
@@ -76,6 +90,10 @@ namespace Lock
 
 	struct Variant
 	{
+		Variant(CSimpleIniA& a_ini, const std::string& a_section);
+
+		void AddModels(CSimpleIniA& a_ini, const std::string& a_section);
+		void AddModels(const std::string& a_key, const std::string& a_entry);
 		void SortModels();
 		void InitForms();
 
@@ -94,6 +112,10 @@ namespace Lock
 		std::vector<Model> lockpicks{};
 		Sound              sounds{};
 	};
+
+	inline bool operator<(const Variant& a_lhs, const Type& a_rhs) { return a_lhs.type < a_rhs; }
+	inline bool operator<(const Type& a_lhs, const Variant& a_rhs) { return a_lhs < a_rhs.type; }
+	inline bool operator<(const Variant& a_lhs, const Variant& a_rhs) { return a_lhs.type < a_rhs.type; }
 
 	struct ConditionChecker
 	{

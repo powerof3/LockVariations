@@ -35,43 +35,15 @@ bool Manager::LoadLocks()
 
 		for (auto& [_section, comment, order] : sections) {
 			std::string section = _section;
-			if (auto values = ini.GetSection(section.c_str()); values && !values->empty()) {
-				Lock::Variant variant{};
-
-				variant.type = Lock::Type(section);
-				variant.sounds = Lock::Sound(ini, section);
-
-				for (auto& [_key, _entry] : *values) {
-					std::string key = _key.pItem;
-					std::string entry = _entry;
-
-					if (key.starts_with("Chest")) {
-						variant.chests.emplace_back(key, entry);
-					} else if (key.starts_with("Door")) {
-						variant.doors.emplace_back(key, entry);
-					} else if (key.starts_with("Lockpick")) {
-						variant.doors.emplace_back(key, entry);
-					}
-				}
-
-				variant.SortModels();
-
-				lockVariants.emplace_back(variant);
+			if (auto it = lockVariants.find(section); it != lockVariants.end()) {
+				auto node = lockVariants.extract(it);
+				node.value().AddModels(ini, section);
+				lockVariants.insert(std::move(node));
+			} else {
+				lockVariants.emplace(ini, section);
 			}
 		}
 	}
-
-	std::ranges::sort(lockVariants, [](const Lock::Variant& a_lhs, const Lock::Variant& a_rhs) {
-		if (a_lhs.type.modelPath != a_rhs.type.modelPath) {
-			return a_lhs.type.modelPath < a_rhs.type.modelPath;
-		}
-		return a_lhs.type.locationStr > a_rhs.type.locationStr;  //biggest to smallest/empty
-	});
-	
-	// shift entries without model path condition to bottom
-	std::ranges::stable_partition(lockVariants, [](const Lock::Variant& a_lhs) {
-		return !a_lhs.type.modelPath.empty();
-	});
 
 	return !lockVariants.empty();
 }
@@ -79,9 +51,12 @@ bool Manager::LoadLocks()
 void Manager::InitLockForms()
 {
 	logger::info("{:*^30}", "DATA LOAD");
-	
-	for (auto& variant : lockVariants) {
-		variant.InitForms();
+
+	for (auto it = lockVariants.begin(); it != lockVariants.end(); it++) {
+		auto node = lockVariants.extract(it);
+		node.value().InitForms();
+		node.value().SortModels();
+		lockVariants.insert(std::move(node));
 	}
 
 	logger::info("Loaded {} lock entries", lockVariants.size());
@@ -104,8 +79,8 @@ void Manager::Sanitize(const std::string& a_path)
 	bool                     finishedUnderWater = false;
 	std::vector<std::string> underWaterLines;
 
-    constexpr unsigned char boms[]{ 0xef, 0xbb, 0xbf };
-	bool                have_bom{ true };
+	constexpr unsigned char boms[]{ 0xef, 0xbb, 0xbf };
+	bool                    have_bom{ true };
 	for (const auto& c : boms) {
 		if ((unsigned char)input.get() != c) {
 			have_bom = false;

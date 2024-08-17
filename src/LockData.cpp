@@ -191,6 +191,33 @@ namespace Lock
 		}
 	}
 
+	Variant::Variant(CSimpleIniA& a_ini, const std::string& a_section) :
+		type(a_section),
+		sounds(a_ini, a_section)
+	{
+		AddModels(a_ini, a_section);
+	}
+
+	void Variant::AddModels(CSimpleIniA& a_ini, const std::string& a_section)
+	{
+		if (auto values = a_ini.GetSection(a_section.c_str()); values && !values->empty()) {
+			for (auto& [key, entry] : *values) {
+				AddModels(key.pItem, entry);
+			}
+		}
+	}
+
+	void Variant::AddModels(const std::string& a_key, const std::string& a_entry)
+	{
+		if (a_key.starts_with("Chest")) {
+			chests.emplace_back(a_key, a_entry);
+		} else if (a_key.starts_with("Door")) {
+			doors.emplace_back(a_key, a_entry);
+		} else if (a_key.starts_with("Lockpick") && a_key != "LockpickingUnlock") {
+			lockpicks.emplace_back(a_key, a_entry);
+		}
+	}
+
 	void Variant::SortModels()
 	{
 		//shift conditional models to top

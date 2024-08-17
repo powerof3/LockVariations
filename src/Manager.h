@@ -15,8 +15,8 @@ public:
 
 private:
 	void Sanitize(const std::string& a_path);
-
+	
 	// members
-	std::vector<Lock::Variant> lockVariants;
-	std::optional<Lock::Sound> currentSound;
+	std::set<Lock::Variant, std::less<>> lockVariants{};
+	std::optional<Lock::Sound>           currentSound{};
 };
