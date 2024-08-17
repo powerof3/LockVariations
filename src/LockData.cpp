@@ -8,7 +8,7 @@ namespace Lock
 			return;
 		}
 
-		auto lockTypeStrs = string::split(a_section, "|"); 
+		auto lockTypeStrs = string::split(a_section, "|");
 
 		modelPath = util::SanitizeModel(lockTypeStrs[0]);
 		if (lockTypeStrs.size() > 1) {
@@ -90,9 +90,9 @@ namespace Lock
 			return isValid;
 		});
 
-			if (flags == Flags::kUnderwater) {
-				result = RE::TESWaterSystem::GetSingleton()->playerUnderwater;
-			}
+		if (flags == Flags::kUnderwater) {
+			result = RE::TESWaterSystem::GetSingleton()->playerUnderwater;
+		}
 
 		return result;
 	}
@@ -168,7 +168,7 @@ namespace Lock
 	{
 		if (a_variant.type.IsValid(*this)) {
 			const auto& models = a_isLockPick ? a_variant.lockpicks : GetModels(a_variant);
-			for (auto& model : models) {
+			for (const auto& model : models) {
 				if (!model.condition || model.condition->IsValid(*this)) {
 					if (model.model != (a_isLockPick ? defaultLockPick : defaultLock)) {
 						return { true, model.model, a_variant.sounds };
@@ -222,6 +222,12 @@ namespace Lock
 		ForEachModelType([&](std::vector<Lock::Model>& models) {
 			std::ranges::stable_partition(models, [](const Lock::Model& model) {
 				return model.condition.has_value();
+			});
+		});
+		// give conditional models + flags highest priority
+		ForEachModelType([&](std::vector<Lock::Model>& models) {
+			std::ranges::stable_partition(models, [](const Lock::Model& model) {
+				return model.condition.has_value() && model.condition->flags != Model::Condition::Flags::kNone;
 			});
 		});
 	}
