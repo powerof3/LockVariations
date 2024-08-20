@@ -92,7 +92,7 @@ void Manager::Sanitize(const std::string& a_path)
 
 	while (std::getline(input, line)) {
 		if (firstLine) {
-			if (line.starts_with(";3.30")) {
+			if (line.starts_with(";4.0.0") || line.starts_with(";3.30")) {
 				return;
 			}
 			firstLine = false;
@@ -126,7 +126,7 @@ void Manager::Sanitize(const std::string& a_path)
 		processedLines.push_front(underWaterLines[1] + "\n");
 		processedLines.push_front(underWaterLines[0]);
 	}
-	processedLines.push_front(";3.30");
+	processedLines.push_front(";4.0.0");
 
 	std::ofstream output(a_path);
 	std::ranges::copy(processedLines, std::ostream_iterator<std::string>(output, "\n"));
