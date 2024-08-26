@@ -1,14 +1,16 @@
 {
   "name": "lock-variations",
-  "version-string": "3.0.0",
+  "version-string": "4.0.0",
   "description": "Lock Variations",
   "homepage": "",
   "license": "MIT",
   "dependencies": [
-    "boost-stl-interfaces",
+    "clib-util",
+    "mergemapper",
     "rsm-binary-io",
-    "simpleini",
     "spdlog",
+    "srell",
     "xbyak"
-  ]
+  ],
+  "builtin-baseline": "b8ac6696e3af59f4f0666ab81a48ae589cde00a8"
 }

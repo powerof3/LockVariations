@@ -3,19 +3,41 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 
+#include <ranges>
+
 #include "RE/Skyrim.h"
 #include "SKSE/SKSE.h"
 
-#include <ranges>
-#include <SimpleIni.h>
+#include <MergeMapperPluginAPI.h>
+
+#include <ClibUtil/distribution.hpp>
+#include <ClibUtil/simpleINI.hpp>
+#include <ClibUtil/singleton.hpp>
 #include <spdlog/sinks/basic_file_sink.h>
+#include <srell.hpp>
 #include <xbyak/xbyak.h>
+
+#include <ClibUtil/editorID.hpp>
 
 #define DLLEXPORT __declspec(dllexport)
 
 namespace logger = SKSE::log;
-namespace string = SKSE::stl::string;
+namespace dist = clib_util::distribution;
+namespace ini = clib_util::ini;
+namespace string = clib_util::string;
+namespace edid = clib_util::editorID;
+
 using namespace std::literals;
+using namespace clib_util::singleton;
+
+// for visting variants
+template <class... Ts>
+struct overload : Ts...
+{
+	using Ts::operator()...;
+};
+
+using FormIDStr = std::variant<RE::FormID, std::string>;
 
 namespace stl
 {

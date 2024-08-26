@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
-set(NAME "po3_LockVariations")
-set(VERSION 3.2.0)
+set(NAME "po3_LockVariations" CACHE STRING "")
+set(VERSION 4.0.0 CACHE STRING "")
 set(VR_VERSION 1)
 set(AE_VERSION 1)
 
@@ -133,7 +133,9 @@ else ()
 	)
 endif()
 
-find_path(SIMPLEINI_INCLUDE_DIRS "ConvertUTF.c")
+find_path(CLIB_UTIL_INCLUDE_DIRS "ClibUtil/utils.hpp")
+find_path(SRELL_INCLUDE_DIRS "srell.hpp")
+find_path(MERGEMAPPER_INCLUDE_DIRS "MergeMapperPluginAPI.h")
 
 # ---- Add source files ----
 
@@ -166,6 +168,7 @@ add_library(
 	${CMAKE_CURRENT_BINARY_DIR}/version.rc
 	.clang-format
 	.editorconfig
+	${MERGEMAPPER_INCLUDE_DIRS}/MergeMapperPluginAPI.cpp
 )
 
 target_compile_features(
@@ -185,7 +188,9 @@ target_include_directories(
 	PRIVATE
 		${CMAKE_CURRENT_BINARY_DIR}/include
 		${CMAKE_CURRENT_SOURCE_DIR}/src
-		${SIMPLEINI_INCLUDE_DIRS}
+		${CLIB_UTIL_INCLUDE_DIRS}
+		${MERGEMAPPER_INCLUDE_DIRS}
+		${SRELL_INCLUDE_DIRS}
 )
 
 target_link_libraries(

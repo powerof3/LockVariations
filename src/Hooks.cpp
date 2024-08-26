@@ -5,20 +5,20 @@ namespace Model
 {
 	namespace Lock
 	{
-		struct RequestModel
+		struct Demand
 		{
-			static std::uint8_t thunk(const char* a_modelPath, std::uintptr_t a_unk02, std::uintptr_t a_unk03)
+			static RE::BSResource::ErrorCode thunk(const char* a_modelPath, std::uintptr_t a_modelHandle, const RE::BSModelDB::DBTraits::ArgsType& a_traits)
 			{
 				auto path = Manager::GetSingleton()->GetLockModel(a_modelPath);
 
-			    if (path != a_modelPath) {
+				if (path != a_modelPath) {
 					if (const auto ref = RE::LockpickingMenu::GetTargetReference()) {
-						logger::info("{}", ref->GetName());
-						logger::info("	Lock : {} -> {}", a_modelPath, path);
+						logger::info("{}", ref->GetBaseObject() ? edid::get_editorID(ref->GetBaseObject()) : ref->GetName());
+						logger::info("\tLock : {} -> {}", a_modelPath, path);
 					}
-			    }
+				}
 
-			    return func(path.c_str(), a_unk02, a_unk03);
+				return func(path.c_str(), a_modelHandle, a_traits);
 			}
 			static inline REL::Relocation<decltype(thunk)> func;
 		};
@@ -26,17 +26,17 @@ namespace Model
 
 	namespace Lockpick
 	{
-		struct RequestModel
+		struct Demand
 		{
-			static std::uint8_t thunk(const char* a_modelPath, std::uintptr_t a_unk02, std::uintptr_t a_unk03)
+			static RE::BSResource::ErrorCode thunk(const char* a_modelPath, std::uintptr_t a_modelHandle, const RE::BSModelDB::DBTraits::ArgsType& a_traits)
 			{
-				auto path = Manager::GetSingleton()->GetLockpickModel(a_modelPath);
+				const auto path = Manager::GetSingleton()->GetLockpickModel(a_modelPath);
 
 				if (path != a_modelPath) {
-					logger::info("	Lockpick : {} -> {}", a_modelPath, path);
+					logger::info("\tLockpick : {} -> {}", a_modelPath, path);
 				}
 
-				return func(path.c_str(), a_unk02, a_unk03);
+				return func(path.c_str(), a_modelHandle, a_traits);
 			}
 			static inline REL::Relocation<decltype(thunk)> func;
 		};
@@ -46,8 +46,8 @@ namespace Model
 	{
 		REL::Relocation<std::uintptr_t> target{ RELOCATION_ID(51081, 51960) };
 
-		stl::write_thunk_call<Lock::RequestModel>(target.address() + OFFSET_3(0xC6, 0xBC, 0xBB));
-		stl::write_thunk_call<Lockpick::RequestModel>(target.address() + OFFSET_3(0xA1, 0x97, 0x96));
+		stl::write_thunk_call<Lock::Demand>(target.address() + OFFSET_3(0xC6, 0xBC, 0xBB));
+		stl::write_thunk_call<Lockpick::Demand>(target.address() + OFFSET_3(0xA1, 0x97, 0x96));
 	}
 }
 
@@ -59,10 +59,12 @@ namespace Sound
 		{
 			std::string editorID = a_editorID;
 
-			if (const auto soundData = Manager::GetSingleton()->GetSoundData(); soundData) {
-				editorID = (editorID == "UILockpickingCylinderSqueakA") ?
-				               soundData->UILockpickingCylinderSqueakA :
-                               soundData->UILockpickingCylinderSqueakB;
+			if (const auto& soundData = Manager::GetSingleton()->GetSounds()) {
+				if (editorID == "UILockpickingCylinderSqueakA") {
+					editorID = soundData->UILockpickingCylinderSqueakA;
+				} else {
+					editorID = soundData->UILockpickingCylinderSqueakB;				
+				}
 			}
 
 			return func(editorID.c_str());
@@ -74,10 +76,10 @@ namespace Sound
 	{
 		static void thunk(const char* a_editorID)
 		{
-			const auto soundData = Manager::GetSingleton()->GetSoundData();
+			const auto&       soundData = Manager::GetSingleton()->GetSounds();
 			const std::string editorID = soundData ?
 			                                 soundData->UILockpickingCylinderStop :
-                                             a_editorID;
+			                                 a_editorID;
 
 			return func(editorID.c_str());
 		}
@@ -88,10 +90,10 @@ namespace Sound
 	{
 		static void thunk(const char* a_editorID)
 		{
-			const auto soundData = Manager::GetSingleton()->GetSoundData();
+			const auto&       soundData = Manager::GetSingleton()->GetSounds();
 			const std::string editorID = soundData ?
 			                                 soundData->UILockpickingCylinderTurn :
-                                             a_editorID;
+			                                 a_editorID;
 
 			return func(editorID.c_str());
 		}
@@ -102,10 +104,10 @@ namespace Sound
 	{
 		static void thunk(const char* a_editorID)
 		{
-			const auto soundData = Manager::GetSingleton()->GetSoundData();
+			const auto&       soundData = Manager::GetSingleton()->GetSounds();
 			const std::string editorID = soundData ?
 			                                 soundData->UILockpickingPickMovement :
-                                             a_editorID;
+			                                 a_editorID;
 
 			return func(editorID.c_str());
 		}
@@ -116,10 +118,10 @@ namespace Sound
 	{
 		static void thunk(const char* a_editorID)
 		{
-			const auto soundData = Manager::GetSingleton()->GetSoundData();
+			const auto&       soundData = Manager::GetSingleton()->GetSounds();
 			const std::string editorID = soundData ?
 			                                 soundData->UILockpickingUnlock :
-                                             a_editorID;
+			                                 a_editorID;
 
 			return func(editorID.c_str());
 		}
