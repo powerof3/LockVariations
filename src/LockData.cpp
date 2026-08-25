@@ -19,7 +19,8 @@ namespace Lock
 	void Type::InitLocation()
 	{
 		if (!locationStr.empty()) {
-			locationID = util::GetFormID(locationStr);
+			auto locationID = util::GetFormID(locationStr);
+			location = RE::TESForm::LookupByID<RE::BGSLocation>(locationID);
 		}
 	}
 
@@ -29,9 +30,8 @@ namespace Lock
 			return false;
 		}
 
-		if (locationID != 0 && a_checker.location) {
-			const auto loc = RE::TESForm::LookupByID<RE::BGSLocation>(locationID);
-			return loc && (loc == a_checker.location || a_checker.location->IsParent(loc));
+		if (!locationStr.empty() && a_checker.location) {
+			return location && (location == a_checker.location || a_checker.location->IsParent(location));
 		}
 
 		return true;

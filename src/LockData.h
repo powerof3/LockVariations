@@ -35,8 +35,8 @@ namespace Lock
 		// members
 		std::string modelPath{};
 
-		RE::FormID  locationID{};
 		std::string locationStr{};
+		RE::BGSLocation* location{ nullptr }; 
 	};
 
 	struct Sound
