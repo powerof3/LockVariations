@@ -34,22 +34,30 @@ namespace util
 
 	std::string SanitizeTexture(const std::string& a_path)
 	{
+		static const srell::regex slashExpr("/+|\\\\+");
+		static const srell::regex leadingSlashExpr("^\\\\+");
+		static const srell::regex texturesExpr(R"(.*?[^\s]textures\\|^textures\\)", srell::regex::icase);
+
 		auto path = string::tolower(a_path);
 
-		path = srell::regex_replace(path, srell::regex("/+|\\\\+"), "\\");
-		path = srell::regex_replace(path, srell::regex("^\\\\+"), "");
-		path = srell::regex_replace(path, srell::regex(R"(.*?[^\s]textures\\|^textures\\)", srell::regex::icase), "");
+		path = srell::regex_replace(path, slashExpr, "\\");
+		path = srell::regex_replace(path, leadingSlashExpr, "");
+		path = srell::regex_replace(path, texturesExpr, "");
 
 		return path;
 	}
 
 	std::string SanitizeModel(const std::string& a_path)
 	{
+		static const srell::regex slashExpr("/+|\\\\+");
+		static const srell::regex leadingSlashExpr("^\\\\+");
+		static const srell::regex meshesExpr(R"(.*?[^\s]meshes\\|^meshes\\)", srell::regex::icase);
+
 		auto path = string::tolower(a_path);
 
-		path = srell::regex_replace(path, srell::regex("/+|\\\\+"), "\\");
-		path = srell::regex_replace(path, srell::regex("^\\\\+"), "");
-		path = srell::regex_replace(path, srell::regex(R"(.*?[^\s]meshes\\|^meshes\\)", srell::regex::icase), "");
+		path = srell::regex_replace(path, slashExpr, "\\");
+		path = srell::regex_replace(path, leadingSlashExpr, "");
+		path = srell::regex_replace(path, meshesExpr, "");
 
 		return path;
 	}
