@@ -13,8 +13,8 @@ namespace Model
 
 				if (path != a_modelPath) {
 					if (const auto ref = RE::LockpickingMenu::GetTargetReference()) {
-						logger::info("{}", ref->GetBaseObject() ? edid::get_editorID(ref->GetBaseObject()) : ref->GetName());
-						logger::info("\tLock : {} -> {}", a_modelPath, path);
+						REX::INFO("{}", ref->GetBaseObject() ? edid::get_editorID(ref->GetBaseObject()) : ref->GetName());
+						REX::INFO("\tLock : {} -> {}", a_modelPath, path);
 					}
 				}
 
@@ -33,7 +33,7 @@ namespace Model
 				const auto path = Manager::GetSingleton()->GetLockpickModel(a_modelPath);
 
 				if (path != a_modelPath) {
-					logger::info("\tLockpick : {} -> {}", a_modelPath, path);
+					REX::INFO("\tLockpick : {} -> {}", a_modelPath, path);
 				}
 
 				return func(path.c_str(), a_modelHandle, a_traits);
@@ -136,7 +136,7 @@ namespace Sound
 		stl::write_thunk_call<CylinderStop>(update_lock_angle.address() + OFFSET_3(0xD9, 0xD7, 0x11E));
 		stl::write_thunk_call<LockpickingUnlock>(update_lock_angle.address() + OFFSET(0xA1, 0x9F));
 
-		REL::Relocation<std::uintptr_t> rotate_lock{ RELOCATION_ID(51098, 51980) };
+		REL::Relocation<std::uintptr_t> rotate_lock{ RELOCATION_ID_VERSIONED(51098, 51980, 524009) };
 		stl::write_thunk_call<CylinderTurn>(rotate_lock.address() + OFFSET(0x33, 0xBC));
 
 		REL::Relocation<std::uintptr_t> update_pick_angle{ RELOCATION_ID(51094, 51976) };

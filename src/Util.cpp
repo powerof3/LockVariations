@@ -4,8 +4,8 @@ namespace util
 {
 	RE::FormID GetFormID(const std::string& a_str)
 	{
-		if (const auto splitID = string::split(a_str, "~"); splitID.size() == 2) {
-			const auto  formID = string::to_num<RE::FormID>(splitID[0], true);
+		if (const auto splitID = REX::STR::SPLIT(a_str, "~"); splitID.size() == 2) {
+			const auto  formID = REX::STR::TO_NUM<RE::FormID>(splitID[0], true);
 			const auto& modName = splitID[1];
 			if (g_mergeMapperInterface) {
 				const auto [mergedModName, mergedFormID] = g_mergeMapperInterface->GetNewFormID(modName.c_str(), formID);
@@ -14,8 +14,8 @@ namespace util
 				return RE::TESDataHandler::GetSingleton()->LookupFormID(formID, modName);
 			}
 		}
-		if (string::is_only_hex(a_str, true)) {
-			return string::to_num<RE::FormID>(a_str, true);
+		if (REX::STR::IS_ONLY_HEX(a_str, true)) {
+			return REX::STR::TO_NUM<RE::FormID>(a_str, true);
 		}
 		if (const auto form = RE::TESForm::LookupByEditorID(a_str)) {
 			return form->GetFormID();
@@ -34,30 +34,30 @@ namespace util
 
 	std::string SanitizeTexture(const std::string& a_path)
 	{
-		static const srell::regex slashExpr("/+|\\\\+");
-		static const srell::regex leadingSlashExpr("^\\\\+");
-		static const srell::regex texturesExpr(R"(.*?[^\s]textures\\|^textures\\)", srell::regex::icase);
+		static const boost::regex slashExpr("/+|\\\\+");
+		static const boost::regex leadingSlashExpr("^\\\\+");
+		static const boost::regex texturesExpr(R"(.*?[^\s]textures\\|^textures\\)", boost::regex::icase);
 
-		auto path = string::tolower(a_path);
+		auto path = REX::STR::TO_LOWER(a_path);
 
-		path = srell::regex_replace(path, slashExpr, "\\");
-		path = srell::regex_replace(path, leadingSlashExpr, "");
-		path = srell::regex_replace(path, texturesExpr, "");
+		path = boost::regex_replace(path, slashExpr, "\\");
+		path = boost::regex_replace(path, leadingSlashExpr, "");
+		path = boost::regex_replace(path, texturesExpr, "");
 
 		return path;
 	}
 
 	std::string SanitizeModel(const std::string& a_path)
 	{
-		static const srell::regex slashExpr("/+|\\\\+");
-		static const srell::regex leadingSlashExpr("^\\\\+");
-		static const srell::regex meshesExpr(R"(.*?[^\s]meshes\\|^meshes\\)", srell::regex::icase);
+		static const boost::regex slashExpr("/+|\\\\+");
+		static const boost::regex leadingSlashExpr("^\\\\+");
+		static const boost::regex meshesExpr(R"(.*?[^\s]meshes\\|^meshes\\)", boost::regex::icase);
 
-		auto path = string::tolower(a_path);
+		auto path = REX::STR::TO_LOWER(a_path);
 
-		path = srell::regex_replace(path, slashExpr, "\\");
-		path = srell::regex_replace(path, leadingSlashExpr, "");
-		path = srell::regex_replace(path, meshesExpr, "");
+		path = boost::regex_replace(path, slashExpr, "\\");
+		path = boost::regex_replace(path, leadingSlashExpr, "");
+		path = boost::regex_replace(path, meshesExpr, "");
 
 		return path;
 	}

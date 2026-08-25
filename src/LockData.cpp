@@ -8,7 +8,7 @@ namespace Lock
 			return;
 		}
 
-		auto lockTypeStrs = string::split(a_section, "|");
+		auto lockTypeStrs = REX::STR::SPLIT(a_section, "|");
 
 		modelPath = util::SanitizeModel(lockTypeStrs[0]);
 		if (lockTypeStrs.size() > 1) {
@@ -54,7 +54,7 @@ namespace Lock
 	Model::Condition::Condition(const std::string& a_id, const std::string& a_flags)
 	{
 		if (dist::is_valid_entry(a_id)) {
-			auto vec = string::split(a_id, ",");
+			auto vec = REX::STR::SPLIT(a_id, ",");
 			for (auto& id : vec) {
 				ids.push_back(id);
 			}
@@ -135,7 +135,7 @@ namespace Lock
 	Model::Model(const std::string& key, const std::string& entry) :
 		model(entry)
 	{
-		auto vec = string::split(key, "|");
+		auto vec = REX::STR::SPLIT(key, "|");
 		if (vec.size() > 1) {
 			condition = Condition(
 				vec[1],
@@ -150,7 +150,7 @@ namespace Lock
 		}
 	}
 
-	ConditionChecker::ConditionChecker(RE::TESObjectREFR* a_ref, RE::TESBoundObject* a_base, RE::TESModel* a_model) :
+	ConditionChecker::ConditionChecker(const RE::TESObjectREFRPtr& a_ref, RE::TESBoundObject* a_base, RE::TESModel* a_model) :
 		base(a_base),
 		location(a_ref->GetCurrentLocation()),
 		modelPath(util::SanitizeModel(a_model->GetModel()))

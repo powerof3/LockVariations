@@ -2,7 +2,7 @@
 
 #include "LockData.h"
 
-class Manager : public ISingleton<Manager>
+class Manager : public REX::TSingleton<Manager>
 {
 public:
 	bool LoadLocks();

@@ -2,21 +2,21 @@
 
 bool Manager::LoadLocks()
 {
-	logger::info("{:*^30}", "INI");
+	REX::INFO("{:*^30}", "INI");
 
 	std::vector<std::string> configs = dist::get_configs(R"(Data\)", "_LID"sv);
 
 	if (configs.empty()) {
-		logger::warn("\tNo .ini files with _LID suffix were found within the Data folder, aborting...");
+		REX::WARN("\tNo .ini files with _LID suffix were found within the Data folder, aborting...");
 		return false;
 	}
 
-	logger::info("{} matching inis found", configs.size());
+	REX::INFO("{} matching inis found", configs.size());
 
 	std::ranges::sort(configs);
 
 	for (auto& path : configs) {
-		logger::info("INI : {}", path);
+		REX::INFO("INI : {}", path);
 
 		Sanitize(path);
 
@@ -25,7 +25,7 @@ bool Manager::LoadLocks()
 		ini.SetMultiKey();
 
 		if (const auto rc = ini.LoadFile(path.c_str()); rc < 0) {
-			logger::error("\tcouldn't read INI");
+			REX::ERROR("\tcouldn't read INI");
 			continue;
 		}
 
@@ -50,7 +50,7 @@ bool Manager::LoadLocks()
 
 void Manager::InitLockForms()
 {
-	logger::info("{:*^30}", "DATA LOAD");
+	REX::INFO("{:*^30}", "DATA LOAD");
 
 	for (auto it = lockVariants.begin(); it != lockVariants.end(); it++) {
 		auto node = lockVariants.extract(it);
@@ -59,8 +59,8 @@ void Manager::InitLockForms()
 		lockVariants.insert(std::move(node));
 	}
 
-	logger::info("Loaded {} lock entries", lockVariants.size());
-	logger::info("{:*^30}", "INFO");
+	REX::INFO("Loaded {} lock entries", lockVariants.size());
+	REX::INFO("{:*^30}", "INFO");
 }
 
 // hack
@@ -98,15 +98,15 @@ void Manager::Sanitize(const std::string& a_path)
 			firstLine = false;
 		}
 		if (line.contains('[')) {
-			string::replace_first_instance(line, ":", "|");
+			REX::STR::REPLACE_FIRST_INSTANCE(line, ":", "|");
 		}
 		if (underwater) {
 			if (line.contains("Door")) {
-				string::replace_first_instance(line, "Door", "Door|NONE|underwater");
+				REX::STR::REPLACE_FIRST_INSTANCE(line, "Door", "Door|NONE|underwater");
 				underWaterLines.push_back(line);
 			}
 			if (line.contains("Chest")) {
-				string::replace_first_instance(line, "Chest", "Chest|NONE|underwater");
+				REX::STR::REPLACE_FIRST_INSTANCE(line, "Chest", "Chest|NONE|underwater");
 				underWaterLines.push_back(line);
 				finishedUnderWater = true;
 			}
@@ -137,9 +137,9 @@ std::string Manager::GetLockModel(const char* a_fallbackPath)
 	//reset
 	currentSound = std::nullopt;
 
-	const auto ref = RE::LockpickingMenu::GetTargetReference();
-	const auto base = ref ? ref->GetBaseObject() : nullptr;
-	const auto model = base ? base->As<RE::TESModel>() : nullptr;
+	const auto& ref = RE::LockpickingMenu::GetTargetReference();
+	const auto  base = ref ? ref->GetBaseObject() : nullptr;
+	const auto  model = base ? base->As<RE::TESModel>() : nullptr;
 
 	if (ref && base && model) {
 		Lock::ConditionChecker checker(ref, base, model);

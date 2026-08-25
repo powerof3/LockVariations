@@ -125,7 +125,7 @@ namespace Lock
 			RE::BGSTextureSet* txst{};
 		};
 
-		ConditionChecker(RE::TESObjectREFR* a_ref, RE::TESBoundObject* a_base, RE::TESModel* a_model);
+		ConditionChecker(const RE::TESObjectREFRPtr& a_ref, RE::TESBoundObject* a_base, RE::TESModel* a_model);
 
 		[[nodiscard]] std::tuple<bool, std::string, Sound> IsValid(const Variant& a_variant, bool a_isLockPick) const;
 		[[nodiscard]] const std::vector<Model>&            GetModels(const Variant& a_variant) const;
