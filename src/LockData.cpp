@@ -164,19 +164,19 @@ namespace Lock
 		}
 	}
 
-	std::tuple<bool, std::string, Sound> ConditionChecker::IsValid(const Variant& a_variant, bool a_isLockPick) const
+	ConditionChecker::Result ConditionChecker::IsValid(const Variant& a_variant, bool a_isLockPick) const
 	{
 		if (a_variant.type.IsValid(*this)) {
 			const auto& models = a_isLockPick ? a_variant.lockpicks : GetModels(a_variant);
 			for (const auto& model : models) {
 				if (!model.condition || model.condition->IsValid(*this)) {
 					if (model.model != (a_isLockPick ? defaultLockPick : defaultLock)) {
-						return { true, model.model, a_variant.sounds };
+						return { &model.model, &a_variant.sounds };
 					}
 				}
 			}
 		}
-		return { false, "", Sound() };
+		return { nullptr, nullptr };
 	}
 
 	const std::vector<Model>& ConditionChecker::GetModels(const Variant& a_variant) const

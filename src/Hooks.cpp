@@ -59,11 +59,11 @@ namespace Sound
 		{
 			std::string editorID = a_editorID;
 
-			if (const auto& soundData = Manager::GetSingleton()->GetSounds()) {
+			if (const auto soundData = Manager::GetSingleton()->GetSounds()) {
 				if (editorID == "UILockpickingCylinderSqueakA") {
 					editorID = soundData->UILockpickingCylinderSqueakA;
 				} else {
-					editorID = soundData->UILockpickingCylinderSqueakB;				
+					editorID = soundData->UILockpickingCylinderSqueakB;
 				}
 			}
 
@@ -76,7 +76,7 @@ namespace Sound
 	{
 		static void thunk(const char* a_editorID)
 		{
-			const auto&       soundData = Manager::GetSingleton()->GetSounds();
+			const auto        soundData = Manager::GetSingleton()->GetSounds();
 			const std::string editorID = soundData ?
 			                                 soundData->UILockpickingCylinderStop :
 			                                 a_editorID;
@@ -90,7 +90,7 @@ namespace Sound
 	{
 		static void thunk(const char* a_editorID)
 		{
-			const auto&       soundData = Manager::GetSingleton()->GetSounds();
+			const auto        soundData = Manager::GetSingleton()->GetSounds();
 			const std::string editorID = soundData ?
 			                                 soundData->UILockpickingCylinderTurn :
 			                                 a_editorID;
@@ -104,7 +104,7 @@ namespace Sound
 	{
 		static void thunk(const char* a_editorID)
 		{
-			const auto&       soundData = Manager::GetSingleton()->GetSounds();
+			const auto        soundData = Manager::GetSingleton()->GetSounds();
 			const std::string editorID = soundData ?
 			                                 soundData->UILockpickingPickMovement :
 			                                 a_editorID;
@@ -118,7 +118,7 @@ namespace Sound
 	{
 		static void thunk(const char* a_editorID)
 		{
-			const auto&       soundData = Manager::GetSingleton()->GetSounds();
+			const auto        soundData = Manager::GetSingleton()->GetSounds();
 			const std::string editorID = soundData ?
 			                                 soundData->UILockpickingUnlock :
 			                                 a_editorID;

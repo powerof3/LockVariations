@@ -16,7 +16,7 @@ namespace Lock
 		Type(const std::string& a_section);
 
 		bool operator<(const Type& a_rhs) const
-		{	
+		{
 			if (modelPath.empty() && !a_rhs.modelPath.empty()) {
 				return false;
 			}
@@ -46,7 +46,7 @@ namespace Lock
 
 		// members
 		std::string UILockpickingCylinderSqueakA{ "UILockpickingCylinderSqueakA" };
-		std::string UILockpickingCylinderSqueakB{ "UILockpickingCylinderSqueakA" };
+		std::string UILockpickingCylinderSqueakB{ "UILockpickingCylinderSqueakB" };
 		std::string UILockpickingCylinderStop{ "UILockpickingCylinderStop" };
 		std::string UILockpickingCylinderTurn{ "UILockpickingCylinderTurn" };
 		std::string UILockpickingPickMovement{ "UILockpickingPickMovement" };
@@ -57,7 +57,7 @@ namespace Lock
 	{
 		Model() = default;
 		Model(std::string_view a_model) :
-			model(a_model){};
+			model(a_model) {};
 		Model(const std::string& key, const std::string& entry);
 
 		struct Condition
@@ -125,10 +125,18 @@ namespace Lock
 			RE::BGSTextureSet* txst{};
 		};
 
+		struct Result
+		{
+			explicit operator bool() const { return model != nullptr; }
+
+			const std::string* model{ nullptr };
+			const Sound*       sounds{ nullptr };
+		};
+
 		ConditionChecker(const RE::TESObjectREFRPtr& a_ref, RE::TESBoundObject* a_base, RE::TESModel* a_model);
 
-		[[nodiscard]] std::tuple<bool, std::string, Sound> IsValid(const Variant& a_variant, bool a_isLockPick) const;
-		[[nodiscard]] const std::vector<Model>&            GetModels(const Variant& a_variant) const;
+		[[nodiscard]] Result                    IsValid(const Variant& a_variant, bool a_isLockPick) const;
+		[[nodiscard]] const std::vector<Model>& GetModels(const Variant& a_variant) const;
 
 		// members
 		RE::TESBoundObject*  base{};

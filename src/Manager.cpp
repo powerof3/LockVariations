@@ -132,37 +132,8 @@ void Manager::Sanitize(const std::string& a_path)
 	std::ranges::copy(processedLines, std::ostream_iterator<std::string>(output, "\n"));
 }
 
-std::string Manager::GetLockModel(const char* a_fallbackPath)
+std::string Manager::GetModel(const char* a_fallbackPath, bool a_isLockPick)
 {
-	//reset
-	currentSound = std::nullopt;
-
-	const auto& ref = RE::LockpickingMenu::GetTargetReference();
-	const auto  base = ref ? ref->GetBaseObject() : nullptr;
-	const auto  model = base ? base->As<RE::TESModel>() : nullptr;
-
-	if (ref && base && model) {
-		Lock::ConditionChecker checker(ref, base, model);
-		for (auto& variant : lockVariants) {
-			auto [result, modelPath, sounds] = checker.IsValid(variant, false);
-			if (result) {
-				currentSound = sounds;
-				return modelPath;
-			}
-		}
-	}
-
-	return a_fallbackPath;
-}
-
-std::string Manager::GetLockpickModel(const char* a_fallbackPath)
-{
-	std::string path(a_fallbackPath);
-
-	if (path == Lock::skeletonKey) {
-		return path;
-	}
-
 	const auto ref = RE::LockpickingMenu::GetTargetReference();
 	const auto base = ref ? ref->GetBaseObject() : nullptr;
 	const auto model = base ? base->As<RE::TESModel>() : nullptr;
@@ -170,17 +141,36 @@ std::string Manager::GetLockpickModel(const char* a_fallbackPath)
 	if (ref && base && model) {
 		Lock::ConditionChecker checker(ref, base, model);
 		for (auto& variant : lockVariants) {
-			auto [result, modelPath, sounds] = checker.IsValid(variant, true);
-			if (result) {
-				return modelPath;
+			if (const auto result = checker.IsValid(variant, a_isLockPick)) {
+				if (!a_isLockPick) {
+					currentSound = result.sounds;
+				}
+				return *result.model;
 			}
 		}
 	}
 
-	return path;
+	return a_fallbackPath;
 }
 
-const std::optional<Lock::Sound>& Manager::GetSounds()
+std::string Manager::GetLockModel(const char* a_fallbackPath)
+{
+	//reset
+	currentSound = nullptr;
+
+	return GetModel(a_fallbackPath, false);
+}
+
+std::string Manager::GetLockpickModel(const char* a_fallbackPath)
+{
+	if (a_fallbackPath == Lock::skeletonKey) {
+		return a_fallbackPath;
+	}
+
+	return GetModel(a_fallbackPath, true);
+}
+
+const Lock::Sound* Manager::GetSounds()
 {
 	return currentSound;
 }

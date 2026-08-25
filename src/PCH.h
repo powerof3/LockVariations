@@ -68,11 +68,11 @@ namespace Runtime
 #elif SKYRIMVR
 #	define OFFSET(se, ae) se
 #	define OFFSET_3(se, ae, vr) vr
-#	define RELOCATION_ID_VERSIONED(SE, AE, AE1179) REL::ID(SE)
+#	define RELOCATION_ID_VERSIONED(SE, AE, AE1799) REL::ID(SE)
 #else
 #	define OFFSET(se, ae) se
 #	define OFFSET_3(se, ae, vr) se
-#	define RELOCATION_ID_VERSIONED(SE, AE, AE1179) REL::ID(SE)
+#	define RELOCATION_ID_VERSIONED(SE, AE, AE1799) REL::ID(SE)
 #endif
 
 #include "Version.h"
